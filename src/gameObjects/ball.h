@@ -1,12 +1,17 @@
-typedef struct Ball {
+class Ball
+{
+private:
     unsigned int positionX;
     unsigned int positionY;
     int velocityX;
     int velocityY;
-    unsigned int RADIUS;
-} Ball;
+    const unsigned int RADIUS;
 
-void move();
-void updateVelocity(int vX, int vY);
-void reverseVelocityX();
-void reverseVelocityY();
+public:
+    Ball(unsigned int positionX, unsigned int positionY, int velocityX, int velocityY, unsigned int RADIUS);
+    ~Ball();
+    void move();
+    void updateVelocity(int vX, int vY);
+    void reverseVelocityX();
+    void reverseVelocityY();
+};

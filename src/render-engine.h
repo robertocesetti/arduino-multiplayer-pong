@@ -1,18 +1,19 @@
-//#include <U8glib.h>
+#include <U8glib.h>
 
-typedef struct Display {
-    //U8GLIB_SSD1306_128X64 device;
-    void * device;
-    int width;
-    int height;
-} Display;
+class RenderEngine
+{
+private:
+    U8GLIB_SSD1306_128X64 display;
+    const int width;
+    const int height;
 
-typedef struct RenderEngine {
-    //U8GLIB_SSD1306_128X64 device;
-    Display * display;
-} RenderEngine;
+    void clearDisplay();
 
-
-void initializeRender(RenderEngine *renderEngine);
-
-void render(void);
+public:
+    RenderEngine();
+    ~RenderEngine();
+    
+    int getWidth() { return width; }
+    int getHeight() { return height; }
+    void render();
+};

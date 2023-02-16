@@ -82,15 +82,10 @@ void setup()
   Serial.begin(9600);
   Serial.println("Ciaone");
 
-  RenderEngine *re = (RenderEngine *)calloc(1, sizeof(RenderEngine *));
-  if (!isNull(re))
-  {
-    initializeRender(re);
-  }
-  else
-  {
-    Serial.println("Rob e' gay");
-  }
+  RenderEngine re {};
+  Serial.println(re.getWidth());
+  Serial.println(re.getHeight());
+  re.render();
 }
 
 int isNull(void *p)

@@ -7,7 +7,7 @@ void start(GameEngineStat *gameEngine) {
     // network.init()
     // render.changeScene(START);
     
-    initializeRender(gameEngine->renderEngine);
+    //initializeRender(gameEngine->renderEngine);
 }
 
 static void _gameLoop(){
