@@ -1,3 +1,3 @@
-void *receiveData(void);
+//void *receiveData(void);
 
-void sendData(void *data);
+//void sendData(void *data);

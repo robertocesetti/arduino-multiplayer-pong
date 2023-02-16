@@ -1,5 +1,22 @@
 #include <Arduino_FreeRTOS.h>
 #include "src/render-engine.h"
+#include "src/game-engine.h"
+
+void setup()
+{
+  Serial.begin(9600);
+  Serial.println("Arduino Multiplayer Pong");
+
+  GameEngine gameEngine {};
+  gameEngine.start();
+}
+
+void gameLoop() {}
+void render() {}
+void network() {}
+
+void loop() {}
+
 
 /*
 Interfaces:
@@ -76,26 +93,3 @@ Enums:
 
 
 */
-
-void setup()
-{
-  Serial.begin(9600);
-  Serial.println("Ciaone");
-
-  RenderEngine re {};
-  Serial.println(re.getWidth());
-  Serial.println(re.getHeight());
-  re.render();
-}
-
-int isNull(void *p)
-{
-
-  if (p == NULL)
-  {
-    return 1;
-  }
-  return 0;
-}
-
-void loop() {}

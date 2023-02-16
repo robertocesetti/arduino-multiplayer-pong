@@ -1,15 +1,29 @@
+#include <Arduino_FreeRTOS.h>
+#include "gameEntities/paddle.h"
+#include "gameEntities/ball.h"
 #include "render-engine.h"
+#include "game-loop.h"
 
-typedef enum SceneType { START, GAME, END } SceneType;
+enum SceneType { START, GAME, END };
 
-typedef struct GameEngineStat {
-    unsigned short running;
-    RenderEngine* renderEngine;
+class GameEngine
+{
+private:
+    bool running;
+    RenderEngine renderEngine;
     SceneType scene;
-} GameEngineStat;
+    TaskHandle_t Handle_aTask;
+    GameEntity gameEntity;
+    GameLoop gameLoop;
 
-GameEngineStat* create();
+    void setupEnvironment();
 
-void start();
+public:
+    GameEngine();
+    ~GameEngine();
+    void start();
+    void stop();
 
-void end();
+    GameLoop getGameLoopHandler();
+    RenderEngine getRenderEngine();
+};
