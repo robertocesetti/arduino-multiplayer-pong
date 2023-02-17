@@ -17,7 +17,7 @@ void GameLoop::update(GameEntity *gameEntities)
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
     Paddle *paddle2 = gameEntities->getPaddle2();
-    ball->updateVelocity(1, 1);
+    ball->updateVelocity(2, 1);
 
     int ups = 0;
     unsigned long lastTime = millis();
