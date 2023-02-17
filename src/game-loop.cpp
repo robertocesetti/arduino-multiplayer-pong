@@ -2,6 +2,8 @@
 #include <Arduino_FreeRTOS.h>
 #include "game-loop.h"
 
+static const int SKEW = 3;
+
 GameLoop::GameLoop()
 {
 }
@@ -44,12 +46,12 @@ void GameLoop::update(GameEntity *gameEntities)
 void GameLoop::checkCollisionWithBoard(Ball *ball)
 {
     // Check for collisions with the top and bottom of the screen
-    if ((ball->getPositionY() - ball->getRadius() -1) <= displayProperties->topLeftY || (ball->getPositionY() + ball->getRadius() +1) > displayProperties->bottomLeftY)
+    if ((ball->getPositionY() - ball->getRadius() - 1) <= displayProperties->topLeftY || (ball->getPositionY() + ball->getRadius() + 1) > displayProperties->bottomLeftY)
     {
         ball->reverseVelocityY();
     }
     // Check for collisions with the left and right of the screen
-    if ((ball->getPositionX() - ball->getRadius() -1) <= displayProperties->topLeftX || (ball->getPositionX() + ball->getRadius() +1) > displayProperties->topRightX)
+    if ((ball->getPositionX() - ball->getRadius() - 1) <= displayProperties->topLeftX || (ball->getPositionX() + ball->getRadius() + 1) > displayProperties->topRightX)
     {
         ball->reverseVelocityX();
     }
@@ -61,6 +63,11 @@ void GameLoop::checkCollisionWithPaddle(Ball *ball, Paddle *paddle)
     if ((ball->getPositionX() + ball->getRadius() > paddle->getPositionX() && ball->getPositionX() - ball->getRadius() < paddle->getPositionX() + paddle->getWidth()) && ball->getPositionY() > paddle->getPositionY() && ball->getPositionY() < (paddle->getPositionY() + paddle->getHeight()))
     {
         ball->reverseVelocityX();
-        ball->reverseVelocityY();
+
+        // Add some randomness to the ball motion, based on the current skew setting
+        int randomVelocity = random(1, SKEW + 1);
+        ball->setVelocityY(randomVelocity);
+        if (ball->getPositionY() <= paddle->getPositionY() + (3 * paddle->getHeight()) / 7)
+            ball->reverseVelocityY();
     }
 }

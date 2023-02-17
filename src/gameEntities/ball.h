@@ -16,8 +16,9 @@ public:
     void updateVelocity(int vX, int vY);
     void reverseVelocityX();
     void reverseVelocityY();
+    void setVelocityY(int velocityY) { this->velocityY = velocityY; }
     void setPosition(int positionX, int positionY);
-    unsigned int getRadius() {return RADIUS;}
-    unsigned int getPositionX() {return positionX;}
-    unsigned int getPositionY() {return positionY;}
+    unsigned int getRadius() { return RADIUS; }
+    unsigned int getPositionX() { return positionX; }
+    unsigned int getPositionY() { return positionY; }
 };
