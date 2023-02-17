@@ -1,9 +1,12 @@
 #include <Arduino_FreeRTOS.h>
 #include <U8glib.h>
+#include <Arduino.h>
 #include "render-engine.h"
 #include "gameEntities/game-entity.h"
 
-RenderEngine::RenderEngine() : display(U8G_I2C_OPT_NONE | U8G_I2C_OPT_FAST), width(display.getWidth()), height(display.getHeight())
+RenderEngine::RenderEngine() : display(U8G_I2C_OPT_NONE | U8G_I2C_OPT_FAST)
+                               , width(display.getWidth())
+                               , height(display.getHeight())
 {
     this->clearDisplay();
 }
@@ -12,7 +15,21 @@ RenderEngine::~RenderEngine()
 {
 }
 
-
+void RenderEngine::render2()
+{
+    Serial.println("render2");
+    //while(true){
+        display.firstPage();
+        do
+        {
+            int ballX = 10;
+            int ballY = 20;
+            int ballR = 2;
+            
+            display.drawDisc(ballX, ballY, ballR, U8G_DRAW_ALL);
+        } while (display.nextPage());
+    //}
+}
 
 void RenderEngine::render(GameEntity* gameEntities)
 {

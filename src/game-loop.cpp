@@ -1,6 +1,6 @@
 #include "game-loop.h"
 
-GameLoop::GameLoop(/* args */)
+GameLoop::GameLoop()
 {
 }
 

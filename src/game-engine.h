@@ -28,5 +28,6 @@ public:
 
     GameLoop getGameLoopHandler();
     RenderEngine getRenderEngine();
+    GameEntity getGameEntity();
     bool isRunning();
 };

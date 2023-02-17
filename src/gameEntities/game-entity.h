@@ -6,9 +6,9 @@
 class GameEntity
 {
 private:
-    Ball ball {};
-    Paddle paddle1 {};
-    Paddle paddle2 {};
+    Ball ball;
+    Paddle paddle1;
+    Paddle paddle2;
     
 public:
     GameEntity();

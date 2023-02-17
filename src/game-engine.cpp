@@ -3,24 +3,20 @@
 #include "gameEntities/game-entity.h"
 #include "game-engine.h"
 
-// static ?
+void xTaskRender(void *parmas);
 
 void xTaskGameLoop(void *params)
 {
     static_cast<GameEngine *>(params)->getGameLoopHandler().update((GameEntity *)params);
 }
 
-void xTaskRender(void *params)
-{
-    static_cast<GameEngine *>(params)->getRenderEngine().render((GameEntity *)params);
-}
-
 void xTaskCommunication(void *param)
 {
 }
 
-GameEngine::GameEngine(/* args */) : running(false), renderEngine{}, scene(SceneType::START), gameEntity{}
+GameEngine::GameEngine() : running(false), scene(START)
 {
+    // setupEnvironment();
 }
 
 GameEngine::~GameEngine()
@@ -37,10 +33,40 @@ void GameEngine::start()
     running = true;
 
     // TODO: network.init()
-    //setupEnvironment();
+    setupEnvironment();
 
-    //BaseType_t gameLoopTaskCreated = xTaskCreate(xTaskGameLoop, "Gameloop", 1024, &gameEntity, 1, &Handle_aTask);
-    //BaseType_t renderTaskCreated = xTaskCreate(xTaskRender, "Rendering", 1024, &gameEntity, 1, NULL);
+    BaseType_t renderTaskCreated = xTaskCreate(xTaskRender, "Rendering", 256, this, 1, NULL);
+    if (renderTaskCreated == pdPASS)
+    {
+        Serial.println("Rendering Task created!");
+    }
+    else
+    {
+        Serial.println("Rendering Task NOT created!");
+    }
+
+    // vTaskStartScheduler();
+
+    /*
+        BaseType_t gameLoopTaskCreated = xTaskCreate(xTaskGameLoop, "Gameloop", 1024, &gameEntity, 1, &Handle_aTask);
+        if (gameLoopTaskCreated == pdPASS)
+        {
+            Serial.println("GameLoop Task created!");
+        }
+        Serial.println(gameLoopTaskCreated);*/
+}
+
+void xTaskRender(void *params)
+{
+    GameEngine *engine = static_cast<GameEngine *>(params);
+    engine->getRenderEngine().render(&(engine->getGameEntity()));
+
+    while (1)
+    {
+        Serial.println("xTaskRender");
+        //static_cast<GameEngine *>(params)->getRenderEngine().render2();
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
 }
 
 void GameEngine::setupEnvironment()
@@ -60,7 +86,12 @@ RenderEngine GameEngine::getRenderEngine()
     return renderEngine;
 }
 
-bool GameEngine::isRunning(){
+GameEntity GameEngine::getGameEntity(){
+    return gameEntity;
+}
+
+bool GameEngine::isRunning()
+{
     return running;
 }
 
