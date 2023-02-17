@@ -15,7 +15,7 @@ void GameLoop::update(GameEntity *gameEntities)
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
     Paddle *paddle2 = gameEntities->getPaddle2();
-    ball->updateVelocity(1, 0);
+    ball->updateVelocity(1, 1);
 
     int ups = 0;
     unsigned long lastTime = millis();
@@ -44,12 +44,12 @@ void GameLoop::update(GameEntity *gameEntities)
 void GameLoop::checkCollisionWithBoard(Ball *ball)
 {
     // Check for collisions with the top and bottom of the screen
-    if (ball->getPositionY() <= displayProperties->bottomLeftY || ball->getPositionY() > displayProperties->topLeftY)
+    if ((ball->getPositionY() - ball->getRadius() -1) <= displayProperties->topLeftY || (ball->getPositionY() + ball->getRadius() +1) > displayProperties->bottomLeftY)
     {
         ball->reverseVelocityY();
     }
     // Check for collisions with the left and right of the screen
-    if (ball->getPositionX() <= displayProperties->topLeftX || ball->getPositionX() > displayProperties->topRightX)
+    if ((ball->getPositionX() - ball->getRadius() -1) <= displayProperties->topLeftX || (ball->getPositionX() + ball->getRadius() +1) > displayProperties->topRightX)
     {
         ball->reverseVelocityX();
     }
@@ -58,9 +58,8 @@ void GameLoop::checkCollisionWithBoard(Ball *ball)
 void GameLoop::checkCollisionWithPaddle(Ball *ball, Paddle *paddle)
 {
     // Checks for the collisions with the paddle
-
-    if((ball->getPositionX() + ball->getRadius() > paddle->getPositionX() && ball->getPositionX() - ball->getRadius() < paddle->getPositionX() + paddle->getWidth())
-        && ball->getPositionY() > paddle->getPositionY() && ball->getPositionY() < (paddle->getPositionY() + paddle->getHeight())){
+    if ((ball->getPositionX() + ball->getRadius() > paddle->getPositionX() && ball->getPositionX() - ball->getRadius() < paddle->getPositionX() + paddle->getWidth()) && ball->getPositionY() > paddle->getPositionY() && ball->getPositionY() < (paddle->getPositionY() + paddle->getHeight()))
+    {
         ball->reverseVelocityX();
         ball->reverseVelocityY();
     }
