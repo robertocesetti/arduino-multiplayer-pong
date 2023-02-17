@@ -6,28 +6,33 @@
 #include "render-engine.h"
 #include "game-loop.h"
 
-enum SceneType { START, GAME, END };
+enum SceneType
+{
+    START,
+    GAME,
+    END
+};
 
 class GameEngine
 {
 private:
     bool running;
-    RenderEngine renderEngine;
     SceneType scene;
-    TaskHandle_t Handle_aTask;
+    RenderEngine renderEngine;
     GameEntity gameEntity;
     GameLoop gameLoop;
 
     void setupEnvironment();
+    void createTasks();
 
 public:
     GameEngine();
     ~GameEngine();
     void start();
     void stop();
-
-    GameLoop getGameLoopHandler();
-    RenderEngine getRenderEngine();
-    GameEntity getGameEntity();
-    bool isRunning();
+    
+    bool isRunning(){return running;}
+    GameLoop* getGameLoopHandler(){return &gameLoop;}
+    RenderEngine* getRenderEngine(){return &renderEngine;}
+    GameEntity* getGameEntity(){return &gameEntity;}
 };

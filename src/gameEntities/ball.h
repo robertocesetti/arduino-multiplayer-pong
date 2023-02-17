@@ -7,7 +7,7 @@ private:
     unsigned int positionY = 0;
     int velocityX = 0;
     int velocityY = 0;
-    const unsigned int RADIUS = 3;
+    const unsigned int RADIUS = 2;
 
 public:
     Ball();

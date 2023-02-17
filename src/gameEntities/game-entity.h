@@ -15,7 +15,7 @@ public:
     ~GameEntity();
 
     void initialize(int width, int heigth);
-    Ball getBall();
-    Paddle getPaddle1();
-    Paddle getPaddle2();
+    Ball* getBall(){return &ball;};
+    Paddle* getPaddle1(){return &paddle1;};
+    Paddle* getPaddle2(){return &paddle2;};
 };

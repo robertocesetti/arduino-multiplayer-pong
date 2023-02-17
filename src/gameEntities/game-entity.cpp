@@ -14,16 +14,3 @@ void GameEntity::initialize(int width, int height)
     paddle1.setPosition(paddle1.getWidth(), (height - paddle1.getHeight()) / 2);
     paddle2.setPosition(width - paddle2.getWidth(), (height - paddle2.getHeight()) / 2);
 }
-
-Ball GameEntity::getBall()
-{
-    return ball;
-}
-Paddle GameEntity::getPaddle1()
-{
-    return paddle1;
-}
-Paddle GameEntity::getPaddle2()
-{
-    return paddle2;
-}

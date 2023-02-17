@@ -15,32 +15,15 @@ RenderEngine::~RenderEngine()
 {
 }
 
-void RenderEngine::render2()
-{
-    Serial.println("render2");
-    //while(true){
-        display.firstPage();
-        do
-        {
-            int ballX = 10;
-            int ballY = 20;
-            int ballR = 2;
-            
-            display.drawDisc(ballX, ballY, ballR, U8G_DRAW_ALL);
-        } while (display.nextPage());
-    //}
-}
-
 void RenderEngine::render(GameEntity* gameEntities)
 {
-
     while(true){
         display.firstPage();
         do
         {
-            int ballX = gameEntities->getBall().getPositionX();
-            int ballY = gameEntities->getBall().getPositionY();
-            int ballR = gameEntities->getBall().getRadius();
+            int ballX = gameEntities->getBall()->getPositionX();
+            int ballY = gameEntities->getBall()->getPositionY();
+            int ballR = gameEntities->getBall()->getRadius();
             
             display.drawDisc(ballX, ballY, ballR, U8G_DRAW_ALL);
         } while (display.nextPage());

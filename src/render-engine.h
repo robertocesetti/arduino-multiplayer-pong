@@ -20,5 +20,4 @@ public:
     int getWidth() { return width; }
     int getHeight() { return height; }
     void render(GameEntity* gameEntities);
-    void render2();
 };

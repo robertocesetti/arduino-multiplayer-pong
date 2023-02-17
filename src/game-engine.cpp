@@ -3,11 +3,16 @@
 #include "gameEntities/game-entity.h"
 #include "game-engine.h"
 
-void xTaskRender(void *parmas);
+void xTaskRender(void *params)
+{
+    GameEngine *engine = static_cast<GameEngine *>(params);
+    engine->getRenderEngine()->render(engine->getGameEntity());
+}
 
 void xTaskGameLoop(void *params)
 {
-    static_cast<GameEngine *>(params)->getGameLoopHandler().update((GameEntity *)params);
+    GameEngine *engine = static_cast<GameEngine *>(params);
+    engine->getGameLoopHandler()->update(engine->getGameEntity());
 }
 
 void xTaskCommunication(void *param)
@@ -16,7 +21,6 @@ void xTaskCommunication(void *param)
 
 GameEngine::GameEngine() : running(false), scene(START)
 {
-    // setupEnvironment();
 }
 
 GameEngine::~GameEngine()
@@ -34,7 +38,18 @@ void GameEngine::start()
 
     // TODO: network.init()
     setupEnvironment();
+    createTasks();
+}
 
+void GameEngine::setupEnvironment()
+{
+    int w = renderEngine.getWidth();
+    int h = renderEngine.getHeight();
+    gameEntity.initialize(w, h);
+}
+
+void GameEngine::createTasks()
+{
     BaseType_t renderTaskCreated = xTaskCreate(xTaskRender, "Rendering", 256, this, 1, NULL);
     if (renderTaskCreated == pdPASS)
     {
@@ -45,59 +60,18 @@ void GameEngine::start()
         Serial.println("Rendering Task NOT created!");
     }
 
-    // vTaskStartScheduler();
-
-    /*
-        BaseType_t gameLoopTaskCreated = xTaskCreate(xTaskGameLoop, "Gameloop", 1024, &gameEntity, 1, &Handle_aTask);
-        if (gameLoopTaskCreated == pdPASS)
-        {
-            Serial.println("GameLoop Task created!");
-        }
-        Serial.println(gameLoopTaskCreated);*/
-}
-
-void xTaskRender(void *params)
-{
-    GameEngine *engine = static_cast<GameEngine *>(params);
-    engine->getRenderEngine().render(&(engine->getGameEntity()));
-
-    while (1)
+    BaseType_t gameLoopTaskCreated = xTaskCreate(xTaskGameLoop, "Gameloop", 256, this, 1, NULL);
+    if (gameLoopTaskCreated == pdPASS)
     {
-        Serial.println("xTaskRender");
-        //static_cast<GameEngine *>(params)->getRenderEngine().render2();
-        vTaskDelay(pdMS_TO_TICKS(500));
+        Serial.println("GameLoop Task created!");
     }
-}
-
-void GameEngine::setupEnvironment()
-{
-    int w = renderEngine.getWidth();
-    int h = renderEngine.getHeight();
-    gameEntity.initialize(w, h);
-}
-
-GameLoop GameEngine::getGameLoopHandler()
-{
-    return gameLoop;
-}
-
-RenderEngine GameEngine::getRenderEngine()
-{
-    return renderEngine;
-}
-
-GameEntity GameEngine::getGameEntity(){
-    return gameEntity;
-}
-
-bool GameEngine::isRunning()
-{
-    return running;
+    else
+    {
+        Serial.println("GameLoop Task NOT created!");
+    }
 }
 
 void GameEngine::stop()
 {
-    vTaskDelete(Handle_aTask);
-
     running = false;
 }
