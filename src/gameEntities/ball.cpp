@@ -19,11 +19,11 @@ void Ball::updateVelocity(int vX, int vY){
 }
 
 void Ball::reverseVelocityX(){
-    positionX = -positionX;
+    velocityX = -velocityX;
 }
 
 void Ball::reverseVelocityY(){
-    positionY = -positionY;
+    velocityY = -velocityY;
 }
 
 void Ball::setPosition(int positionX, int positionY){

@@ -2,6 +2,7 @@
 
 #include "ball.h"
 #include "paddle.h"
+#include "../display-properties.h"
 
 class GameEntity
 {
@@ -14,7 +15,7 @@ public:
     GameEntity();
     ~GameEntity();
 
-    void initialize(int width, int heigth);
+    void initialize(DisplayProperties *displayProperties);
     Ball* getBall(){return &ball;};
     Paddle* getPaddle1(){return &paddle1;};
     Paddle* getPaddle2(){return &paddle2;};

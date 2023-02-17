@@ -21,6 +21,9 @@ void xTaskCommunication(void *param)
 
 GameEngine::GameEngine() : running(false), scene(START)
 {
+    RenderEngine *renderEngine = getRenderEngine();
+    gameLoop.setDisplayProperties(renderEngine->getDisplayProperties());
+    gameEntity.initialize(renderEngine->getDisplayProperties());
 }
 
 GameEngine::~GameEngine()
@@ -37,15 +40,7 @@ void GameEngine::start()
     running = true;
 
     // TODO: network.init()
-    setupEnvironment();
     createTasks();
-}
-
-void GameEngine::setupEnvironment()
-{
-    int w = renderEngine.getWidth();
-    int h = renderEngine.getHeight();
-    gameEntity.initialize(w, h);
 }
 
 void GameEngine::createTasks()
