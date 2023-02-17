@@ -12,4 +12,5 @@ public:
     ~Ball();
 
     unsigned int getRadius() { return RADIUS; }
+    virtual bool Ball::collideWithBoard(DisplayProperties* displayProperties);
 };

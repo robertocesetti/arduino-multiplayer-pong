@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity.h"
+#include "ball.h"
 
 class Paddle : public Entity
 {
@@ -12,6 +13,11 @@ public:
     Paddle();
     ~Paddle();
 
+    virtual bool Paddle::collideWithBoard(DisplayProperties* displayProperties);
+    
+    void moveUsingAI(Ball* ball, bool godMode = false);
+
     unsigned int getWidth() {return WIDTH;}
     unsigned int getHeight() {return HEIGHT;}
+
 };

@@ -1,12 +1,13 @@
 #pragma once
+#include "../display-properties.h"
 
 class Entity
 {
 protected:
-    float positionX = 0;
-    float positionY = 0;
-    float velocityX = 0;
-    float velocityY = 0;
+    float positionX = 0.0f;
+    float positionY = 0.0f;
+    float velocityX = 0.0f;
+    float velocityY = 0.0f;
 
 public:
     Entity();
@@ -16,7 +17,8 @@ public:
     void updateVelocity(float vX, float vY);
     void reverseVelocityX();
     void reverseVelocityY();
-
+    virtual bool collideWithBoard(DisplayProperties* displayProperties);
+    
     void setPosition(float positionX, float positionY)
     {
         this->positionX = positionX;
@@ -26,4 +28,6 @@ public:
 
     unsigned int getPositionX() { return (unsigned int) positionX; }
     unsigned int getPositionY() { return (unsigned int) positionY; }
+    float getVelocityX() { return velocityX; }
+    float getVelocityY() { return velocityY; }
 };

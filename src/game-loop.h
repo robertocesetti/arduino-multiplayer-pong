@@ -14,7 +14,7 @@ public:
     ~GameLoop();
     void update(GameEntity *gameEntities);
     void setDisplayProperties(DisplayProperties *displayProperties) { this->displayProperties = displayProperties; }
-    void GameLoop::checkCollisionWithBoard(Ball *ball);
+    void GameLoop::checkCollisionWithBoard(Entity *ball, unsigned int dimension);
     void GameLoop::checkCollisionWithPaddle(Ball* ball, Paddle *paddle);
 };
 

@@ -17,10 +17,48 @@ void GameLoop::update(GameEntity *gameEntities)
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
     Paddle *paddle2 = gameEntities->getPaddle2();
-    ball->updateVelocity(2, 1);
+    ball->updateVelocity(0.5f, 1);
+
+    paddle1->updateVelocity(0, 0.5f);
+    paddle2->updateVelocity(0, -0.2f);
 
     int ups = 0;
     unsigned long lastTime = millis();
+
+    /* FIX UPS
+
+        https://stackoverflow.com/questions/5405034/attempting-to-create-a-stable-game-engine-loop
+
+        long maxWorkingTimePerFrame = 1000 / 20;  //this is optional
+        unsigned long lastStartTime = millis();
+        while(true)
+        {
+            long elapsedTime = millis() - lastStartTime;
+            lastStartTime = millis();
+
+            // update objects elapsedTime = deltaTime;
+            Serial.println(elapsedTime);
+            ups++;
+            if (lastStartTime > lastTime + 1000)
+            {
+                Serial.print("UPS: ");
+                Serial.println(ups);
+                lastTime = lastStartTime;
+                ups = 0;
+            }
+            ball->move();
+            checkCollisionWithBoard(ball);
+            checkCollisionWithPaddle(ball, paddle1);
+            checkCollisionWithPaddle(ball, paddle2);
+
+
+            //enforcing a maximum framerate here is optional...you don't need to sleep the thread
+            long processingTimeForCurrentFrame = millis() - lastStartTime;
+            if(processingTimeForCurrentFrame < maxWorkingTimePerFrame)
+            {
+                vTaskDelay(pdMS_TO_TICKS(maxWorkingTimePerFrame - processingTimeForCurrentFrame));
+            }
+        }*/
 
     while (true)
     {
@@ -34,26 +72,32 @@ void GameLoop::update(GameEntity *gameEntities)
         }
 
         ball->move();
+        paddle1->moveUsingAI(ball, true);
+        paddle2->move();
 
-        checkCollisionWithBoard(ball);
+
+        if (paddle1->collideWithBoard(displayProperties))
+        {
+            paddle1->reverseVelocityY();
+            
+            /*
+            float velocity = random(1, 10) / 10.0f;
+            if(paddle1->getVelocityY() < 0){
+                velocity*=-1;
+            }       
+            paddle1->updateVelocity(0, velocity);
+            */
+        }
+
+        if (paddle2->collideWithBoard(displayProperties))
+            paddle2->reverseVelocityY();
+
+        ball->collideWithBoard(displayProperties);
+
         checkCollisionWithPaddle(ball, paddle1);
         checkCollisionWithPaddle(ball, paddle2);
 
         vTaskDelay(pdMS_TO_TICKS(10));
-    }
-}
-
-void GameLoop::checkCollisionWithBoard(Ball *ball)
-{
-    // Check for collisions with the top and bottom of the screen
-    if ((ball->getPositionY() - ball->getRadius() - 1) <= displayProperties->topLeftY || (ball->getPositionY() + ball->getRadius() + 1) > displayProperties->bottomLeftY)
-    {
-        ball->reverseVelocityY();
-    }
-    // Check for collisions with the left and right of the screen
-    if ((ball->getPositionX() - ball->getRadius() - 1) <= displayProperties->topLeftX || (ball->getPositionX() + ball->getRadius() + 1) > displayProperties->topRightX)
-    {
-        ball->reverseVelocityX();
     }
 }
 
