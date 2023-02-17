@@ -17,7 +17,7 @@ public:
     void reverseVelocityX();
     void reverseVelocityY();
     void setPosition(int positionX, int positionY);
-    unsigned int getRadius();
-    unsigned int getPositionX();
-    unsigned int getPositionY();
+    unsigned int getRadius() {return RADIUS;}
+    unsigned int getPositionX() {return positionX;}
+    unsigned int getPositionY() {return positionY;}
 };

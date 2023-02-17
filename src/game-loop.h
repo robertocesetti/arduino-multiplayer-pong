@@ -12,7 +12,9 @@ private:
 public:
     GameLoop();
     ~GameLoop();
-    void setDisplayProperties(DisplayProperties* displayProperties) { this->displayProperties = displayProperties; }
-    void update(GameEntity* gameEntities);
+    void update(GameEntity *gameEntities);
+    void setDisplayProperties(DisplayProperties *displayProperties) { this->displayProperties = displayProperties; }
+    void GameLoop::checkCollisionWithBoard(Ball *ball);
+    void GameLoop::checkCollisionWithPaddle(Ball* ball, Paddle *paddle);
 };
 

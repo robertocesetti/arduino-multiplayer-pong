@@ -30,15 +30,3 @@ void Ball::setPosition(int positionX, int positionY){
     this->positionX = positionX; 
     this->positionY = positionY; 
 }
-
-unsigned int Ball::getRadius(){
-    return RADIUS;
-}
-
-unsigned int Ball::getPositionX(){
-    return positionX;
-}
-
-unsigned int Ball::getPositionY(){
-    return positionY;
-}

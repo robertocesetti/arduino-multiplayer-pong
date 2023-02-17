@@ -12,6 +12,8 @@ private:
     
     void initDisplayProperties();
     void drawBorder();
+    void drawBall(Ball* ball);
+    void drawPaddle(Paddle* paddle);
     void clearDisplay();
     void displayLose();
 

@@ -13,6 +13,9 @@ public:
     Paddle();
     ~Paddle();
     void setPosition(int pX, int pY);
-    int getWidth();
-    int getHeight();
+
+    unsigned int getPositionX() {return positionX;}
+    unsigned int getPositionY(){return positionY;}
+    unsigned int getWidth() {return WIDTH;}
+    unsigned int getHeight() {return HEIGHT;}
 };
