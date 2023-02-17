@@ -1,3 +1,5 @@
+#pragma once
+
 #include <U8glib.h>
 #include "gameEntities/game-entity.h"
 

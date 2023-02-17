@@ -1,22 +1,35 @@
 #include <Arduino_FreeRTOS.h>
-#include "src/render-engine.h"
 #include "src/game-engine.h"
+
+GameEngine gameEngine{};
+
+void MainTask(void *parmas);
 
 void setup()
 {
   Serial.begin(9600);
   Serial.println("Arduino Multiplayer Pong");
 
-  GameEngine gameEngine {};
-  gameEngine.start();
+  xTaskCreate(MainTask, "MainTask", 1024, NULL, 1, NULL);
 }
 
-void gameLoop() {}
-void render() {}
-void network() {}
+void MainTask(void *parmas)
+{
+  int i = 1;
+  while (i)
+  {
+    Serial.println("MainTask called");
+    //Serial.println(gameEngine.isRunning());
+    //gameEngine.start();
+    vTaskDelay(pdMS_TO_TICKS(500));
+    //i = 0;
+  }
+  // 
+
+  vTaskDelete(NULL);
+}
 
 void loop() {}
-
 
 /*
 Interfaces:

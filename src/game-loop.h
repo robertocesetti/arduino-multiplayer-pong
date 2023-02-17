@@ -1,4 +1,7 @@
+#pragma once
+
 #include "gameEntities/game-entity.h"
+
 class GameLoop
 {
 private:

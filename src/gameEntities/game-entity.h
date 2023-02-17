@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ball.h"
 #include "paddle.h"
 

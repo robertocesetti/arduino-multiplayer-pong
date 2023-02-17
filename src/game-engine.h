@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Arduino_FreeRTOS.h>
 #include "gameEntities/paddle.h"
 #include "gameEntities/ball.h"
@@ -26,4 +28,5 @@ public:
 
     GameLoop getGameLoopHandler();
     RenderEngine getRenderEngine();
+    bool isRunning();
 };
