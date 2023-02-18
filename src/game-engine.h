@@ -5,6 +5,7 @@
 #include "gameEntities/ball.h"
 #include "render-engine.h"
 #include "game-loop.h"
+#include "input-manager.h"
 
 enum SceneType
 {
@@ -21,8 +22,8 @@ private:
     RenderEngine renderEngine;
     GameEntity gameEntity;
     GameLoop gameLoop;
+    InputManager inputManager;
 
-    void setupEnvironment();
     void createTasks();
 
 public:
@@ -35,4 +36,5 @@ public:
     GameLoop* getGameLoopHandler(){return &gameLoop;}
     RenderEngine* getRenderEngine(){return &renderEngine;}
     GameEntity* getGameEntity(){return &gameEntity;}
+    InputManager* getInputManager(){return &inputManager;}
 };

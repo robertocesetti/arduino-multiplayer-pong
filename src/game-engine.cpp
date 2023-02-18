@@ -1,7 +1,16 @@
 #include <Arduino_FreeRTOS.h>
 #include <Arduino.h>
+#include <FreeRTOSConfig.h>
 #include "gameEntities/game-entity.h"
 #include "game-engine.h"
+
+static StackType_t renderTaskStack[128];
+static StackType_t gameLoopTaskStack[128];
+static StackType_t inputManagerTaskStack[64];
+
+static StaticTask_t renderTaskBuffer;
+static StaticTask_t gameLoopTaskBuffer;
+static StaticTask_t inputManagerTaskBuffer;
 
 void xTaskRender(void *params)
 {
@@ -15,7 +24,13 @@ void xTaskGameLoop(void *params)
     engine->getGameLoopHandler()->update(engine->getGameEntity());
 }
 
-void xTaskCommunication(void *param)
+void xTaskInputManager(void *params)
+{
+    GameEngine *engine = static_cast<GameEngine *>(params);
+    engine->getInputManager()->startReading(engine->getGameEntity());
+}
+
+void xTaskCommunication(void *params)
 {
 }
 
@@ -32,8 +47,6 @@ GameEngine::~GameEngine()
 
 void GameEngine::start()
 {
-    Serial.println("Ciao");
-
     if (running)
         return;
 
@@ -45,25 +58,38 @@ void GameEngine::start()
 
 void GameEngine::createTasks()
 {
-    BaseType_t renderTaskCreated = xTaskCreate(xTaskRender, "Rendering", 256, this, 1, NULL);
-    if (renderTaskCreated == pdPASS)
-    {
-        Serial.println("Rendering Task created!");
-    }
-    else
-    {
-        Serial.println("Rendering Task NOT created!");
-    }
+    // Create the task for the rendering
+    xTaskCreateStatic(
+        xTaskRender,      // Pointer to the task function
+        "Render",         // Task name
+        128,              // Stack size in words
+        this,             // Task parameter
+        1,                // Task priority
+        renderTaskStack,  // Pointer to the task stack
+        &renderTaskBuffer // Pointer to the task control block
+    );
 
-    BaseType_t gameLoopTaskCreated = xTaskCreate(xTaskGameLoop, "Gameloop", 256, this, 1, NULL);
-    if (gameLoopTaskCreated == pdPASS)
-    {
-        Serial.println("GameLoop Task created!");
-    }
-    else
-    {
-        Serial.println("GameLoop Task NOT created!");
-    }
+    // Create the task for the game loop
+    xTaskCreateStatic(
+        xTaskGameLoop,      // Pointer to the task function
+        "GameLoop",         // Task name
+        128,                // Stack size in words
+        this,               // Task parameter
+        1,                  // Task priority
+        gameLoopTaskStack,  // Pointer to the task stack
+        &gameLoopTaskBuffer // Pointer to the task control block
+    );
+
+    // Create the task for input management
+    xTaskCreateStatic(
+        xTaskInputManager,      // Pointer to the task function
+        "InputMgr",             // Task name
+        64,                     // Stack size in words
+        this,                   // Task parameter
+        1,                      // Task priority
+        inputManagerTaskStack,  // Pointer to the task stack
+        &inputManagerTaskBuffer // Pointer to the task control block
+    );
 }
 
 void GameEngine::stop()

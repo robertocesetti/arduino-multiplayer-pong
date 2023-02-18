@@ -2,6 +2,8 @@
 
 GameEngine gameEngine;
 
+// TODO: communication, score, scenes (win / loose / start), borders (L/R), ball skew
+// TODO: FReeRTOS auto configure
 
 void setup()
 {

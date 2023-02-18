@@ -17,10 +17,10 @@ void GameLoop::update(GameEntity *gameEntities)
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
     Paddle *paddle2 = gameEntities->getPaddle2();
-    ball->updateVelocity(5, 2);
+    ball->updateVelocity(0.5f, 1);
 
     paddle1->updateVelocity(0, 0.5f);
-    paddle2->updateVelocity(0, -0.2f);
+    //paddle2->updateVelocity(0, -0.2f);
 
     int ups = 0;
     unsigned long lastTime = millis();
@@ -40,7 +40,7 @@ void GameLoop::update(GameEntity *gameEntities)
 
         ball->move();
         paddle1->moveUsingAI(ball, true);
-        paddle2->move();
+        paddle2->moveUsingAI(ball, true);
 
         if (paddle1->collideWithBoard(displayProperties))
         {
@@ -55,6 +55,7 @@ void GameLoop::update(GameEntity *gameEntities)
             */
         }
 
+        //paddle2->collideWithBoard(displayProperties);
         if (paddle2->collideWithBoard(displayProperties))
             paddle2->reverseVelocityY();
 

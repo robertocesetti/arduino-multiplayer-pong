@@ -32,9 +32,9 @@
     ["oled1:GND", "esp:GND.3", "black", ["v-134.92", "h174.71"]],
     ["oled1:SDA", "esp:A4", "blue", ["v-90.45", "h184.48"]],
     ["oled1:SCL", "esp:A5", "gold", ["v-103.16", "h184.81"]],
-    ["joystick1:VERT", "esp:A2", "green", ["v14.72", "h-200.53"]],
-    ["joystick1:HORZ", "esp:A3", "magenta", ["v29.54", "h-200.63"]],
-    ["joystick1:SEL", "esp:A4", "purple", ["v40.13", "h-200.73"]]
+    ["joystick1:VERT", "esp:A1", "green", ["v14.72", "h-200.53"]],
+    ["joystick1:HORZ", "esp:A0", "magenta", ["v29.54", "h-200.63"]],
+    ["joystick1:SEL", "esp:2", "purple", ["v40.13", "h-200.73"]]
   ],
   "dependencies": {}
 }
