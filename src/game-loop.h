@@ -7,14 +7,15 @@ class GameLoop
 {
 private:
     DisplayProperties* displayProperties;
-    void setDisplayProperties(int width, int height);
+
+    void tick(Ball* ball, Paddle* paddle1, Paddle* paddle2);
+    void checkCollisionWithPaddle(Ball* ball, Paddle *paddle);
 
 public:
     GameLoop();
     ~GameLoop();
+    
     void update(GameEntity *gameEntities);
-    void setDisplayProperties(DisplayProperties *displayProperties) { this->displayProperties = displayProperties; }
-    void GameLoop::checkCollisionWithBoard(Entity *ball, unsigned int dimension);
-    void GameLoop::checkCollisionWithPaddle(Ball* ball, Paddle *paddle);
+    void setDisplayProperties(DisplayProperties* displayProperties) { this->displayProperties = displayProperties; }
 };
 
