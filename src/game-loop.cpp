@@ -4,6 +4,8 @@
 
 static const int SKEW = 3;
 static const int UPS_SET = 30;
+static const int MAXBOUNCEANGLE = 75;
+static const int BALL_SPEED = 1;
 
 GameLoop::GameLoop()
 {
@@ -18,7 +20,7 @@ void GameLoop::update(GameEntity *gameEntities)
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
     Paddle *paddle2 = gameEntities->getPaddle2();
-    ball->updateVelocity(1, 2);
+    ball->updateVelocity(1, 5);
     paddle1->updateVelocity(0, 0.5f);
     // paddle2->updateVelocity(0, -0.2f);
 
@@ -60,7 +62,7 @@ void GameLoop::tick(Ball *ball, Paddle *paddle1, Paddle *paddle2)
 {
 
     ball->move();
-    paddle1->moveUsingAI(ball, true);
+    paddle1->moveUsingAI(ball);
     paddle2->moveUsingAI(ball, true);
 
     if (paddle1->collideWithBoard(displayProperties))
@@ -98,30 +100,87 @@ void GameLoop::checkCollisionWithPaddle(Ball *ball, Paddle *paddle)
     {
         float newX = ball->getPositionX();
         float newY = ball->getPositionY();
-        if (ballIsOnLeft && ball->getVelocityX() > 0)
+
+        if (ball->getPositionY() >= paddle->getPositionY() && ball->getPositionY() <= paddle->getPositionY() + paddle->getHeight())
         {
-            newX = paddle->getPositionX() - ball->getRadius();
+            if (ballIsOnLeft && ball->getVelocityX() > 0)
+            {
+                newX = paddle->getPositionX() - ball->getRadius();
+            }
+            if (ballIsOnRight && ball->getVelocityX() < 0)
+            {
+                newX = paddle->getPositionX() + paddle->getWidth() + ball->getRadius();
+            }
+            ball->reverseVelocityX();
         }
-        if (ballIsOnRight && ball->getVelocityX() < 0)
+        else if (ball->getPositionX() >= paddle->getPositionX() && ball->getPositionX() <= paddle->getPositionX() + paddle->getWidth())
         {
-            newX = paddle->getPositionX() + paddle->getWidth() + ball->getRadius();
+            if (ballIsOnTop && ball->getVelocityY() > 0)
+            {
+                newY = paddle->getPositionY() - ball->getRadius();
+            }
+            if (ballIsOnBottom && ball->getVelocityY() < 0)
+            {
+                newY = paddle->getPositionY() + paddle->getHeight() + ball->getRadius();
+            }
+            ball->reverseVelocityY();
         }
-        if (ballIsOnTop)
+        else
         {
-            newY = paddle->getPositionY() + ball->getRadius();
+            if (ballIsOnLeft && ball->getVelocityX() > 0)
+            {
+                newX = paddle->getPositionX() - ball->getRadius();
+            }
+            if (ballIsOnRight && ball->getVelocityX() < 0)
+            {
+                newX = paddle->getPositionX() + paddle->getWidth() + ball->getRadius();
+            }
+            ball->reverseVelocityX();
+            
+            if (ballIsOnTop && ball->getVelocityY() > 0)
+            {
+                newY = paddle->getPositionY() - ball->getRadius();
+            }
+            if (ballIsOnBottom && ball->getVelocityY() < 0)
+            {
+                newY = paddle->getPositionY() + paddle->getHeight() + ball->getRadius();
+            }
+            ball->reverseVelocityY();
         }
-        if (ballIsOnBottom)
-        {
-            newY = paddle->getPositionY() + paddle->getHeight() - ball->getRadius();
-        }
+
         ball->setPosition(newX, newY);
 
-        ball->reverseVelocityX();
+        /*
+        // -6 a +6 h=12
+        float relativeIntersectY = (paddle->getPositionY()+(paddle->getHeight()/2.0f)) - ball->getPositionY();
+        // -1 a +1
+        float normalizedRelativeIntersectionY = (relativeIntersectY/(paddle->getHeight()/2.0f));
 
+        float bounceAngle = normalizedRelativeIntersectionY * MAXBOUNCEANGLE;
+
+        float ballVx = ball->getVelocityX()*-1;
+        float ballVy = 2 * -sin(bounceAngle);
+
+        ball->updateVelocity(ballVx, ballVy);
+        */
+
+        /*
+        ball->reverseVelocityX();
         // Add some randomness to the ball motion, based on the current skew setting
         int randomVelocity = random(1, SKEW + 1);
         ball->setVelocityY(randomVelocity);
         if (ball->getPositionY() <= paddle->getPositionY() + (3 * paddle->getHeight()) / 7)
             ball->reverseVelocityY();
+*/
     }
 }
+
+/*
+
+   |
+ o |
+   |
+  o|
+
+
+*/
