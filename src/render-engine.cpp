@@ -67,8 +67,8 @@ void RenderEngine::render(GameEntity *gameEntities)
         fps++;
         if (millis() > lastTime + 1000)
         {
-            Serial.print("FPS: ");
-            Serial.println(fps);
+            //Serial.print("FPS: ");
+            //Serial.println(fps);
             lastTime = millis();
             fps = 0;
         }

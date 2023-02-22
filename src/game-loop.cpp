@@ -20,8 +20,8 @@ void GameLoop::update(GameEntity *gameEntities)
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
     Paddle *paddle2 = gameEntities->getPaddle2();
-    ball->updateVelocity(1, 5);
-    paddle1->updateVelocity(0, 0.5f);
+    ball->updateVelocity(0.6f, 0);
+    paddle1->updateVelocity(0, 2);
     // paddle2->updateVelocity(0, -0.2f);
 
     double MS_PER_UPDATE = 1000.0 / UPS_SET;
@@ -49,8 +49,8 @@ void GameLoop::update(GameEntity *gameEntities)
         if (current - lastCheck >= 1000)
         {
             lastCheck = current;
-            Serial.print(F("UPS: "));
-            Serial.println(ups);
+            //Serial.print(F("UPS: "));
+            //Serial.println(ups);
             ups = 0;
         }
 
@@ -62,8 +62,10 @@ void GameLoop::tick(Ball *ball, Paddle *paddle1, Paddle *paddle2)
 {
 
     ball->move();
-    paddle1->moveUsingAI(ball);
-    paddle2->moveUsingAI(ball, true);
+    moveUsingAI(paddle1, ball, true);
+    //moveUsingAI(paddle2, ball, true);
+    paddle2->move();
+    
 
     if (paddle1->collideWithBoard(displayProperties))
     {
@@ -83,104 +85,33 @@ void GameLoop::tick(Ball *ball, Paddle *paddle1, Paddle *paddle2)
         paddle2->reverseVelocityY();
 
     ball->collideWithBoard(displayProperties);
-
-    checkCollisionWithPaddle(ball, paddle1);
-    checkCollisionWithPaddle(ball, paddle2);
+    ball->collideWithPaddle(paddle1);
+    ball->collideWithPaddle(paddle2);
 }
 
-void GameLoop::checkCollisionWithPaddle(Ball *ball, Paddle *paddle)
+void GameLoop::moveUsingAI(Paddle *paddle, Ball *ball, bool godMode = false)
 {
-    bool ballIsOnLeft = ball->getPositionX() + ball->getRadius() > paddle->getPositionX();
-    bool ballIsOnRight = ball->getPositionX() - ball->getRadius() < paddle->getPositionX() + paddle->getWidth();
-    bool ballIsOnTop = ball->getPositionY() + ball->getRadius() > paddle->getPositionY();
-    bool ballIsOnBottom = ball->getPositionY() - ball->getRadius() < paddle->getPositionY() + paddle->getHeight();
-
-    // Checks for the collisions with the paddle
-    if (ballIsOnLeft && ballIsOnRight && ballIsOnTop && ballIsOnBottom)
+    if (godMode)
     {
-        float newX = ball->getPositionX();
-        float newY = ball->getPositionY();
+        paddle->setVelocityY(ball->getVelocityY());
+    }
+    else
+    {
+        if (ball->getVelocityX() < 0 && (ball->getPositionX() - paddle->getPositionX()) < 70)
+        {
+            if (paddle->getVelocityY() == 0.0f)
+                paddle->setVelocityY(0.5f);
 
-        if (ball->getPositionY() >= paddle->getPositionY() && ball->getPositionY() <= paddle->getPositionY() + paddle->getHeight())
-        {
-            if (ballIsOnLeft && ball->getVelocityX() > 0)
+            if (ball->getVelocityY() > 0 && paddle->getVelocityY() < 0 || ball->getVelocityY() < 0 && paddle->getVelocityY() > 0)
             {
-                newX = paddle->getPositionX() - ball->getRadius();
+                paddle->setVelocityY(paddle->getVelocityY() * -1);
             }
-            if (ballIsOnRight && ball->getVelocityX() < 0)
-            {
-                newX = paddle->getPositionX() + paddle->getWidth() + ball->getRadius();
-            }
-            ball->reverseVelocityX();
-        }
-        else if (ball->getPositionX() >= paddle->getPositionX() && ball->getPositionX() <= paddle->getPositionX() + paddle->getWidth())
-        {
-            if (ballIsOnTop && ball->getVelocityY() > 0)
-            {
-                newY = paddle->getPositionY() - ball->getRadius();
-            }
-            if (ballIsOnBottom && ball->getVelocityY() < 0)
-            {
-                newY = paddle->getPositionY() + paddle->getHeight() + ball->getRadius();
-            }
-            ball->reverseVelocityY();
         }
         else
         {
-            if (ballIsOnLeft && ball->getVelocityX() > 0)
-            {
-                newX = paddle->getPositionX() - ball->getRadius();
-            }
-            if (ballIsOnRight && ball->getVelocityX() < 0)
-            {
-                newX = paddle->getPositionX() + paddle->getWidth() + ball->getRadius();
-            }
-            ball->reverseVelocityX();
-            
-            if (ballIsOnTop && ball->getVelocityY() > 0)
-            {
-                newY = paddle->getPositionY() - ball->getRadius();
-            }
-            if (ballIsOnBottom && ball->getVelocityY() < 0)
-            {
-                newY = paddle->getPositionY() + paddle->getHeight() + ball->getRadius();
-            }
-            ball->reverseVelocityY();
+            paddle->setVelocityY(0.0f);
         }
-
-        ball->setPosition(newX, newY);
-
-        /*
-        // -6 a +6 h=12
-        float relativeIntersectY = (paddle->getPositionY()+(paddle->getHeight()/2.0f)) - ball->getPositionY();
-        // -1 a +1
-        float normalizedRelativeIntersectionY = (relativeIntersectY/(paddle->getHeight()/2.0f));
-
-        float bounceAngle = normalizedRelativeIntersectionY * MAXBOUNCEANGLE;
-
-        float ballVx = ball->getVelocityX()*-1;
-        float ballVy = 2 * -sin(bounceAngle);
-
-        ball->updateVelocity(ballVx, ballVy);
-        */
-
-        /*
-        ball->reverseVelocityX();
-        // Add some randomness to the ball motion, based on the current skew setting
-        int randomVelocity = random(1, SKEW + 1);
-        ball->setVelocityY(randomVelocity);
-        if (ball->getPositionY() <= paddle->getPositionY() + (3 * paddle->getHeight()) / 7)
-            ball->reverseVelocityY();
-*/
     }
+
+    paddle->move();
 }
-
-/*
-
-   |
- o |
-   |
-  o|
-
-
-*/

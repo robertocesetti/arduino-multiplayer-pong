@@ -21,14 +21,14 @@ void InputManager::startReading(GameEntity *gameEntities)
         velocityY = 0;
         if (vertical > 700)
         {
-            velocityY = -1;
+            velocityY = -2;
         }
         else if (vertical < 300)
         {
-            velocityY = 1;
+            velocityY = 2;
         }
 
-        // paddle2->updateVelocity(0, velocityY);
+        paddle2->updateVelocity(0, velocityY);
 
         vTaskDelay(pdMS_TO_TICKS(10));
     }

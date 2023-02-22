@@ -9,7 +9,8 @@ private:
     DisplayProperties* displayProperties;
 
     void tick(Ball* ball, Paddle* paddle1, Paddle* paddle2);
-    void checkCollisionWithPaddle(Ball* ball, Paddle *paddle);
+    void moveUsingAI(Paddle* paddle, Ball* ball, bool godMode = false);
+
 
 public:
     GameLoop();

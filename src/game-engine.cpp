@@ -5,7 +5,7 @@
 #include "game-engine.h"
 
 static StackType_t renderTaskStack[128];
-static StackType_t gameLoopTaskStack[128];
+static StackType_t gameLoopTaskStack[256];
 static StackType_t inputManagerTaskStack[64];
 
 static StaticTask_t renderTaskBuffer;
@@ -73,7 +73,7 @@ void GameEngine::createTasks()
     xTaskCreateStatic(
         xTaskGameLoop,      // Pointer to the task function
         "GameLoop",         // Task name
-        128,                // Stack size in words
+        256,                // Stack size in words
         this,               // Task parameter
         1,                  // Task priority
         gameLoopTaskStack,  // Pointer to the task stack
