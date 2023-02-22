@@ -7,23 +7,19 @@
 #include "game-loop.h"
 #include "input-manager.h"
 
-enum SceneType
-{
-    START,
-    GAME,
-    END
-};
+const static int SCENE_NUMBER = 1; 
 
 class GameEngine
 {
 private:
     bool running;
-    SceneType scene;
+    Scene* scenes[SCENE_NUMBER];
     RenderEngine renderEngine;
     GameEntity gameEntity;
     GameLoop gameLoop;
     InputManager inputManager;
 
+    void createScenes();
     void createTasks();
 
 public:
@@ -37,4 +33,5 @@ public:
     RenderEngine* getRenderEngine(){return &renderEngine;}
     GameEntity* getGameEntity(){return &gameEntity;}
     InputManager* getInputManager(){return &inputManager;}
+    void changeScene(SceneType sceneType);
 };

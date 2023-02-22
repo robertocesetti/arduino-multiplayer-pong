@@ -20,7 +20,7 @@ void GameLoop::update(GameEntity *gameEntities)
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
     Paddle *paddle2 = gameEntities->getPaddle2();
-    ball->updateVelocity(0.6f, 0);
+    ball->updateVelocity(1, 1);
     paddle1->updateVelocity(0, 2);
     // paddle2->updateVelocity(0, -0.2f);
 
@@ -49,8 +49,8 @@ void GameLoop::update(GameEntity *gameEntities)
         if (current - lastCheck >= 1000)
         {
             lastCheck = current;
-            //Serial.print(F("UPS: "));
-            //Serial.println(ups);
+            Serial.print(F("UPS: "));
+            Serial.println(ups);
             ups = 0;
         }
 

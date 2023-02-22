@@ -3,6 +3,7 @@
 #include <FreeRTOSConfig.h>
 #include "gameEntities/game-entity.h"
 #include "game-engine.h"
+#include "scenes/game-scene.h"
 
 static StackType_t renderTaskStack[128];
 static StackType_t gameLoopTaskStack[256];
@@ -15,7 +16,7 @@ static StaticTask_t inputManagerTaskBuffer;
 void xTaskRender(void *params)
 {
     GameEngine *engine = static_cast<GameEngine *>(params);
-    engine->getRenderEngine()->render(engine->getGameEntity());
+    engine->getRenderEngine()->render();
 }
 
 void xTaskGameLoop(void *params)
@@ -34,7 +35,7 @@ void xTaskCommunication(void *params)
 {
 }
 
-GameEngine::GameEngine() : running(false), scene(START)
+GameEngine::GameEngine() : running(false)
 {
     RenderEngine *renderEngine = getRenderEngine();
     gameLoop.setDisplayProperties(renderEngine->getDisplayProperties());
@@ -53,6 +54,8 @@ void GameEngine::start()
     running = true;
 
     // TODO: network.init()
+    createScenes();
+    changeScene(GAME);
     createTasks();
 }
 
@@ -90,6 +93,23 @@ void GameEngine::createTasks()
         inputManagerTaskStack,  // Pointer to the task stack
         &inputManagerTaskBuffer // Pointer to the task control block
     );
+}
+
+void GameEngine::createScenes()
+{
+    scenes[0] = new GameScene(&gameEntity);
+}
+
+void GameEngine::changeScene(SceneType sceneType)
+{
+    for (Scene *scene : scenes)
+    {
+        if (scene->getSceneType() == sceneType)
+        {
+            renderEngine.changeScene(scene);
+            return;
+        }
+    }
 }
 
 void GameEngine::stop()

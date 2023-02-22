@@ -4,28 +4,7 @@
 #include "render-engine.h"
 #include "gameEntities/game-entity.h"
 
-// https://xbm.jazzychad.net/
-/* 2 x 64 */
-/*
-static const unsigned char DOTTED_LINE[] PROGMEM = {
-    0xfc, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xfc, 0xfc, 0xfc, 0xfc, 0xff, 0xff,
-    0xff, 0xff, 0xfc, 0xfc, 0xfc, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xfc, 0xfc,
-    0xfc, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xfc, 0xfc, 0xfc, 0xfc, 0xff, 0xff,
-    0xff, 0xff, 0xfc, 0xfc, 0xfc, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xfc, 0xfc,
-    0xfc, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xfc, 0xfc, 0xfc, 0xfc, 0xff, 0xff,
-    0xff, 0xff, 0xfc, 0xfc};
-    */
-
-/* 1 x 64 */
-static const unsigned char DOTTED_LINE[] PROGMEM = {
-    0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0xff, 0xff,
-    0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe,
-    0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0xff, 0xff,
-    0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe,
-    0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0xff, 0xff,
-    0xff, 0xff, 0xfe, 0xfe};
-
-RenderEngine::RenderEngine() : display(U8G_I2C_OPT_NONE | U8G_I2C_OPT_FAST)
+RenderEngine::RenderEngine() : display(U8G_I2C_OPT_NONE | U8G_I2C_OPT_FAST), currentScene(nullptr)
 {
     initDisplayProperties();
     clearDisplay();
@@ -57,7 +36,7 @@ void RenderEngine::initDisplayProperties()
     displayProperties->bottomRightY = h - 1;
 }
 
-void RenderEngine::render(GameEntity *gameEntities)
+void RenderEngine::render()
 {
     int fps = 0;
     unsigned long lastTime = millis();
@@ -67,8 +46,8 @@ void RenderEngine::render(GameEntity *gameEntities)
         fps++;
         if (millis() > lastTime + 1000)
         {
-            //Serial.print("FPS: ");
-            //Serial.println(fps);
+            Serial.print("FPS: ");
+            Serial.println(fps);
             lastTime = millis();
             fps = 0;
         }
@@ -76,37 +55,16 @@ void RenderEngine::render(GameEntity *gameEntities)
         display.firstPage();
         do
         {
-            drawBorder();
-
-            display.drawXBMP(64, 0, 1, 64, DOTTED_LINE);
-
-            drawBall(gameEntities->getBall());
-            drawPaddle(gameEntities->getPaddle1());
-            drawPaddle(gameEntities->getPaddle2());
+            if (currentScene != nullptr)
+                currentScene->render();
         } while (display.nextPage());
     }
 }
 
-void RenderEngine::drawBorder()
+void RenderEngine::changeScene(Scene *scene)
 {
-    display.drawFrame(displayProperties->topLeftX, displayProperties->topLeftY, displayProperties->bottomRightX, displayProperties->bottomRightY);
-}
-
-void RenderEngine::drawBall(Ball *ball)
-{
-    unsigned int ballX = ball->getPositionX();
-    unsigned int ballY = ball->getPositionY();
-    unsigned int ballR = ball->getRadius();
-    display.drawDisc(ballX, ballY, ballR, U8G_DRAW_ALL);
-}
-
-void RenderEngine::drawPaddle(Paddle *paddle)
-{
-    int paddleX = paddle->getPositionX();
-    int paddleY = paddle->getPositionY();
-    int paddleWidth = paddle->getWidth();
-    int paddleHeight = paddle->getHeight();
-    display.drawBox(paddleX, paddleY, paddleWidth, paddleHeight);
+    scene->initialize(&display, displayProperties);
+    currentScene = scene;
 }
 
 void RenderEngine::displayLose()
