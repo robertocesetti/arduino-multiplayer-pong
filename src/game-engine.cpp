@@ -3,15 +3,16 @@
 #include <FreeRTOSConfig.h>
 #include "gameEntities/game-entity.h"
 #include "game-engine.h"
-#include "scenes/game-scene.h"
 
-static StackType_t renderTaskStack[128];
+static StackType_t renderTaskStack[256];
 static StackType_t gameLoopTaskStack[256];
-static StackType_t inputManagerTaskStack[64];
+static StackType_t inputManagerTaskStack[128];
 
 static StaticTask_t renderTaskBuffer;
 static StaticTask_t gameLoopTaskBuffer;
 static StaticTask_t inputManagerTaskBuffer;
+
+static 
 
 void xTaskRender(void *params)
 {
@@ -35,7 +36,7 @@ void xTaskCommunication(void *params)
 {
 }
 
-GameEngine::GameEngine() : running(false)
+GameEngine::GameEngine() : running(false), sceneManager(&gameEntity, &renderEngine), inputManager(&sceneManager)
 {
     RenderEngine *renderEngine = getRenderEngine();
     gameLoop.setDisplayProperties(renderEngine->getDisplayProperties());
@@ -54,9 +55,9 @@ void GameEngine::start()
     running = true;
 
     // TODO: network.init()
-    createScenes();
-    changeScene(GAME);
     createTasks();
+
+
 }
 
 void GameEngine::createTasks()
@@ -65,7 +66,7 @@ void GameEngine::createTasks()
     xTaskCreateStatic(
         xTaskRender,      // Pointer to the task function
         "Render",         // Task name
-        128,              // Stack size in words
+        256,              // Stack size in words
         this,             // Task parameter
         1,                // Task priority
         renderTaskStack,  // Pointer to the task stack
@@ -87,29 +88,12 @@ void GameEngine::createTasks()
     xTaskCreateStatic(
         xTaskInputManager,      // Pointer to the task function
         "InputMgr",             // Task name
-        64,                     // Stack size in words
+        128,                     // Stack size in words
         this,                   // Task parameter
         1,                      // Task priority
         inputManagerTaskStack,  // Pointer to the task stack
         &inputManagerTaskBuffer // Pointer to the task control block
     );
-}
-
-void GameEngine::createScenes()
-{
-    scenes[0] = new GameScene(&gameEntity);
-}
-
-void GameEngine::changeScene(SceneType sceneType)
-{
-    for (Scene *scene : scenes)
-    {
-        if (scene->getSceneType() == sceneType)
-        {
-            renderEngine.changeScene(scene);
-            return;
-        }
-    }
 }
 
 void GameEngine::stop()

@@ -49,8 +49,8 @@ void GameLoop::update(GameEntity *gameEntities)
         if (current - lastCheck >= 1000)
         {
             lastCheck = current;
-            Serial.print(F("UPS: "));
-            Serial.println(ups);
+            //Serial.print(F("UPS: "));
+            //Serial.println(ups);
             ups = 0;
         }
 

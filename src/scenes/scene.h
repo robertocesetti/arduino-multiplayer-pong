@@ -3,8 +3,12 @@
 #include <U8glib.h>
 #include "../display-properties.h"
 
-enum SceneType {
-    GAME
+enum SceneType
+{
+    GAME = 0,
+    SCORE,
+    START,
+    PAUSE
 };
 
 class Scene

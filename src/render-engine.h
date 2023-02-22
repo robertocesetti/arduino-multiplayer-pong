@@ -21,5 +21,6 @@ public:
     
     DisplayProperties* getDisplayProperties() { return displayProperties; }
     void changeScene(Scene* scene);
+    Scene* getCurrentScene(){ return currentScene;}
     void render();
 };

@@ -1,5 +1,5 @@
 {
     "sketch": "arduino-multiplayer-pong.ino",
     "output": "build",
-    "board": "arduino:avr:uno"
+    "board": "arduino:avr:mega"
 }

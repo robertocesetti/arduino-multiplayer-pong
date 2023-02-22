@@ -6,20 +6,18 @@
 #include "render-engine.h"
 #include "game-loop.h"
 #include "input-manager.h"
-
-const static int SCENE_NUMBER = 1; 
+#include "scenes/scene-manager.h"
 
 class GameEngine
 {
 private:
     bool running;
-    Scene* scenes[SCENE_NUMBER];
     RenderEngine renderEngine;
     GameEntity gameEntity;
     GameLoop gameLoop;
     InputManager inputManager;
+    SceneManager sceneManager;
 
-    void createScenes();
     void createTasks();
 
 public:
@@ -33,5 +31,5 @@ public:
     RenderEngine* getRenderEngine(){return &renderEngine;}
     GameEntity* getGameEntity(){return &gameEntity;}
     InputManager* getInputManager(){return &inputManager;}
-    void changeScene(SceneType sceneType);
+    SceneManager* getSceneManager(){return &sceneManager;}
 };
