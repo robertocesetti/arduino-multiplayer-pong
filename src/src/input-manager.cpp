@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Arduino_FreeRTOS.h>
+#include <STM32FreeRTOS.h>
 #include "input-manager.h"
 
 InputManager::InputManager(SceneManager *sm) : sceneManager(sm)

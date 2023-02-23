@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Arduino_FreeRTOS.h>
+#include <STM32FreeRTOS.h>
 #include "game-loop.h"
 
 static const int SKEW = 3;
@@ -89,7 +89,7 @@ void GameLoop::tick(Ball *ball, Paddle *paddle1, Paddle *paddle2)
     ball->collideWithPaddle(paddle2);
 }
 
-void GameLoop::moveUsingAI(Paddle *paddle, Ball *ball, bool godMode = false)
+void GameLoop::moveUsingAI(Paddle *paddle, Ball *ball, bool godMode)
 {
     if (godMode)
     {

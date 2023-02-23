@@ -42,7 +42,7 @@ void GameScene::drawBall()
     unsigned int ballX = gameEntities->getBall()->getPositionX();
     unsigned int ballY = gameEntities->getBall()->getPositionY();
     unsigned int ballR = gameEntities->getBall()->getRadius();
-    display->drawDisc(ballX, ballY, ballR, U8G_DRAW_ALL);
+    display->drawDisc(ballX, ballY, ballR, U8G2_DRAW_ALL);
 }
 
 void GameScene::drawPaddle(Paddle* paddle)
