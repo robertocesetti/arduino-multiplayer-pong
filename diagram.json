@@ -3,20 +3,8 @@
   "author": "Roberto Cesetti",
   "editor": "wokwi",
   "parts": [
-    {
-      "type": "wokwi-arduino-mega",
-      "id": "esp",
-      "top": 22.26,
-      "left": -229.51,
-      "attrs": {}
-    },
-    {
-      "type": "board-ssd1306",
-      "id": "oled1",
-      "top": 361,
-      "left": -263.39,
-      "attrs": {}
-    },
+    { "type": "wokwi-arduino-mega", "id": "esp", "top": 22.26, "left": -229.51, "attrs": {} },
+    { "type": "board-ssd1306", "id": "oled1", "top": 361, "left": -263.39, "attrs": {} },
     {
       "type": "wokwi-analog-joystick",
       "id": "joystick1",
@@ -26,15 +14,15 @@
     }
   ],
   "connections": [
-    ["joystick1:VCC", "esp:5V", "red", ["v23.19", "h-257.93"]],
-    ["oled1:VCC", "esp:5V", "red", ["v-122.21", "h146.26"]],
-    ["joystick1:GND", "esp:GND.3", "black", ["v73.74", "h-277.33"]],
-    ["oled1:GND", "esp:GND.3", "black", ["v-134.92", "h174.71"]],
-    ["oled1:SDA", "esp:A4", "blue", ["v-90.45", "h184.48"]],
-    ["oled1:SCL", "esp:A5", "gold", ["v-103.16", "h184.81"]],
-    ["joystick1:VERT", "esp:A1", "green", ["v14.72", "h-200.53"]],
-    ["joystick1:HORZ", "esp:A0", "magenta", ["v29.54", "h-200.63"]],
-    ["joystick1:SEL", "esp:2", "purple", ["v40.13", "h-200.73"]]
+    [ "joystick1:VCC", "esp:5V", "red", [ "v23.19", "h-257.93" ] ],
+    [ "oled1:VCC", "esp:5V", "red", [ "v-122.21", "h146.26" ] ],
+    [ "joystick1:GND", "esp:GND.3", "black", [ "v73.74", "h-277.33" ] ],
+    [ "oled1:GND", "esp:GND.3", "black", [ "v-134.92", "h174.71" ] ],
+    [ "joystick1:VERT", "esp:A1", "green", [ "v14.72", "h-200.53" ] ],
+    [ "joystick1:HORZ", "esp:A0", "magenta", [ "v29.54", "h-200.63" ] ],
+    [ "joystick1:SEL", "esp:2", "purple", [ "v40.13", "h-200.73" ] ],
+    [ "oled1:SCL", "esp:21", "yellow", [ "v-111.81", "h119.26" ] ],
+    [ "oled1:SDA", "esp:20", "orange", [ "v-103.15", "h293.73" ] ]
   ],
   "dependencies": {}
 }

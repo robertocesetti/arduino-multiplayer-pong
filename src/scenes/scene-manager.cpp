@@ -8,7 +8,6 @@
 SceneManager::SceneManager(GameEntity *ge, RenderEngine *re) : gameEntities(ge), renderEngine(re)
 {
     createScenes();
-    changeScene(START);
 }
 
 SceneManager::~SceneManager()
@@ -22,20 +21,18 @@ void SceneManager::createScenes()
     auto ss = new StartScene();
     auto ps = new PauseScene();
 
-    Serial.print(gs->getSceneType());
-    Serial.print(fs->getSceneType());
-    Serial.print(ss->getSceneType());
-    Serial.print(ps->getSceneType());
-
     scenes[0] = gs;
     scenes[1] = fs;
     scenes[2] = ss;
     scenes[3] = ps;
 
+    Serial.print("Scene loaded:");
     for (Scene *scene : scenes)
     {
-        Serial.println(scene->getSceneType());
+        Serial.print(" ");
+        Serial.print(scene->getSceneType());
     }
+    Serial.print("\n");
 }
 
 void SceneManager::changeScene(SceneType sceneType)
@@ -44,8 +41,9 @@ void SceneManager::changeScene(SceneType sceneType)
     {
         if (scene->getSceneType() == sceneType)
         {
+            Serial.print("Change Scene: ");
+            Serial.println(scene->getSceneType());
             renderEngine->changeScene(scene);
-            //Serial.println(scene->getSceneType());
             return;
         }
     }

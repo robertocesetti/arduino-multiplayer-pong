@@ -54,10 +54,9 @@ void GameEngine::start()
 
     running = true;
 
+    sceneManager.changeScene(START);
     // TODO: network.init()
     createTasks();
-
-
 }
 
 void GameEngine::createTasks()
