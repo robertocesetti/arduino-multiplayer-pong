@@ -29,5 +29,5 @@ public:
 
     unsigned int getRadius() { return RADIUS; }
     void collideWithPaddle(Paddle *paddle);
-    virtual bool Ball::collideWithBoard(DisplayProperties *displayProperties);
+    virtual bool collideWithBoard(DisplayProperties *displayProperties);
 };

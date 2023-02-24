@@ -12,7 +12,7 @@ public:
     Paddle();
     ~Paddle();
 
-    virtual bool Paddle::collideWithBoard(DisplayProperties* displayProperties);
+    virtual bool collideWithBoard(DisplayProperties* displayProperties);
     
     unsigned int getWidth() {return WIDTH;}
     unsigned int getHeight() {return HEIGHT;}

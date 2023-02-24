@@ -1,6 +1,6 @@
-#include <Arduino_FreeRTOS.h>
+//#include <Arduino_FreeRTOS.h>
 #include <Arduino.h>
-#include <FreeRTOSConfig.h>
+//#include <FreeRTOSConfig.h>
 #include "gameEntities/game-entity.h"
 #include "game-engine.h"
 
@@ -10,9 +10,7 @@ static StackType_t inputManagerTaskStack[128];
 
 static StaticTask_t renderTaskBuffer;
 static StaticTask_t gameLoopTaskBuffer;
-static StaticTask_t inputManagerTaskBuffer;
-
-static 
+static StaticTask_t inputManagerTaskBuffer; 
 
 void xTaskRender(void *params)
 {
@@ -73,25 +71,25 @@ void GameEngine::createTasks()
     );
 
     // Create the task for the game loop
-    xTaskCreateStatic(
+    xTaskCreatePinnedToCore(
         xTaskGameLoop,      // Pointer to the task function
         "GameLoop",         // Task name
         256,                // Stack size in words
         this,               // Task parameter
         1,                  // Task priority
-        gameLoopTaskStack,  // Pointer to the task stack
-        &gameLoopTaskBuffer // Pointer to the task control block
+        NULL,
+        1
     );
 
     // Create the task for input management
-    xTaskCreateStatic(
+    xTaskCreatePinnedToCore(
         xTaskInputManager,      // Pointer to the task function
         "InputMgr",             // Task name
         128,                     // Stack size in words
         this,                   // Task parameter
         1,                      // Task priority
-        inputManagerTaskStack,  // Pointer to the task stack
-        &inputManagerTaskBuffer // Pointer to the task control block
+        NULL,
+        1
     );
 }
 

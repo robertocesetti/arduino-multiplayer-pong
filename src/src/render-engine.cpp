@@ -1,10 +1,11 @@
-#include <Arduino_FreeRTOS.h>
-#include <U8glib.h>
+//#include <Arduino_FreeRTOS.h>
+#include <U8g2lib.h>
 #include <Arduino.h>
 #include "render-engine.h"
 #include "gameEntities/game-entity.h"
 
-RenderEngine::RenderEngine() : display(U8G_I2C_OPT_NONE | U8G_I2C_OPT_FAST), currentScene(nullptr)
+RenderEngine::RenderEngine() : display(U8G2_R0, /* reset=*/ U8X8_PIN_NONE), currentScene(nullptr)
+ 
 {
     initDisplayProperties();
     clearDisplay();
@@ -16,6 +17,7 @@ RenderEngine::~RenderEngine()
 
 void RenderEngine::initDisplayProperties()
 {
+    display.begin();
     int w = display.getWidth();
     int h = display.getHeight();
 
@@ -72,12 +74,12 @@ void RenderEngine::displayLose()
     char strBuf[16]; // used for string formatting
 
     // Display the "You Lose" screen
-    display.setFont(u8g_font_gdb20r); // switch to bigger font
+    //display.setFont(u8g_font_gdb20r); // switch to bigger font
     strcpy(strBuf, "TRY");
-    display.drawStr((displayProperties->width - display.getStrPixelWidth(strBuf)) / 2, displayProperties->height / 2, strBuf);
+    display.drawStr((displayProperties->width - display.getStrWidth(strBuf)) / 2, displayProperties->height / 2, strBuf);
     strcpy(strBuf, "AGAIN!");
-    display.drawStr((displayProperties->width - display.getStrPixelWidth(strBuf)) / 2, displayProperties->height, strBuf);
-    display.setFont(u8g_font_profont10r); // switch back to our normal font
+    display.drawStr((displayProperties->width - display.getStrWidth(strBuf)) / 2, displayProperties->height, strBuf);
+    //display.setFont(u8g_font_profont10r); // switch back to our normal font
 }
 
 void RenderEngine::clearDisplay()

@@ -6,9 +6,9 @@
 class InputManager
 {
 private:
-    const int HORZ = A0;
-    const int VERT = A1;
-    const int SEL = 2;
+    const int HORZ = GPIO_NUM_34;
+    const int VERT = GPIO_NUM_35;
+    const int SEL = GPIO_NUM_18;
     SceneManager* sceneManager;
 
 public:

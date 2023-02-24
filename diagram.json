@@ -1,28 +1,30 @@
 {
   "version": 1,
-  "author": "Roberto Cesetti",
+  "author": "Uri Shaked",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-arduino-mega", "id": "esp", "top": 22.26, "left": -229.51, "attrs": {} },
-    { "type": "board-ssd1306", "id": "oled1", "top": 361, "left": -263.39, "attrs": {} },
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": -3.99, "left": 110.22, "attrs": {} },
     {
       "type": "wokwi-analog-joystick",
       "id": "joystick1",
-      "top": 272.48,
-      "left": 155.42,
+      "top": -110.54,
+      "left": -67.27,
       "attrs": {}
-    }
+    },
+    { "type": "board-ssd1306", "id": "oled1", "top": 267.61, "left": 70.33, "attrs": {} }
   ],
   "connections": [
-    [ "joystick1:VCC", "esp:5V", "red", [ "v23.19", "h-257.93" ] ],
-    [ "oled1:VCC", "esp:5V", "red", [ "v-122.21", "h146.26" ] ],
-    [ "joystick1:GND", "esp:GND.3", "black", [ "v73.74", "h-277.33" ] ],
-    [ "oled1:GND", "esp:GND.3", "black", [ "v-134.92", "h174.71" ] ],
-    [ "joystick1:VERT", "esp:A1", "green", [ "v14.72", "h-200.53" ] ],
-    [ "joystick1:HORZ", "esp:A0", "magenta", [ "v29.54", "h-200.63" ] ],
-    [ "joystick1:SEL", "esp:2", "purple", [ "v40.13", "h-200.73" ] ],
-    [ "oled1:SCL", "esp:21", "yellow", [ "v-111.81", "h119.26" ] ],
-    [ "oled1:SDA", "esp:20", "orange", [ "v-103.15", "h293.73" ] ]
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "joystick1:GND", "esp:GND.2", "black", [ "v0" ] ],
+    [ "joystick1:VCC", "esp:3V3", "red", [ "v223.45", "h263.13", "v-74.2" ] ],
+    [ "esp:D34", "joystick1:HORZ", "green", [ "h0" ] ],
+    [ "esp:D18", "joystick1:SEL", "green", [ "h0" ] ],
+    [ "joystick1:VERT", "esp:D35", "green", [ "v0" ] ],
+    [ "oled1:VCC", "esp:3V3", "red", [ "v-45.36", "h111.13", "v-74.2" ] ],
+    [ "oled1:GND", "esp:GND.2", "black", [ "h-104.76", "v-129.06" ] ],
+    [ "oled1:SDA", "esp:D21", "green", [ "h141.23", "v-215.16" ] ],
+    [ "oled1:SCL", "esp:D22", "green", [ "h151.06", "v-244.06" ] ]
   ],
   "dependencies": {}
 }

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <U8glib.h>
+#include <U8g2lib.h>
 #include "display-properties.h"
 #include "scenes/scene.h"
 
 class RenderEngine
 {
 private:
-    U8GLIB_SSD1306_128X64 display;
+    U8G2_SSD1306_128X64_NONAME_1_HW_I2C display;
     DisplayProperties* displayProperties;
     Scene* currentScene;
     

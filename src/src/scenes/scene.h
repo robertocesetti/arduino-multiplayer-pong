@@ -1,6 +1,6 @@
 #pragma once
 
-#include <U8glib.h>
+#include <U8g2lib.h>
 #include "../display-properties.h"
 
 enum SceneType
@@ -15,15 +15,15 @@ class Scene
 {
 protected:
     SceneType type;
-    U8GLIB_SSD1306_128X64 *display;
+    U8G2_SSD1306_128X64_NONAME_1_HW_I2C *display;
     DisplayProperties *displayProperties;
 
 public:
     Scene();
-    ~Scene();
+    virtual ~Scene();
 
-    void initialize(U8GLIB_SSD1306_128X64 *display, DisplayProperties *displayProperties);
-    virtual void render();
+    void initialize(U8G2_SSD1306_128X64_NONAME_1_HW_I2C *display, DisplayProperties *displayProperties);
+    virtual void render() = 0;
 
     SceneType getSceneType() {return type;}
 };

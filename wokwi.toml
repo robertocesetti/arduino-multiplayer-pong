@@ -1,4 +1,4 @@
 [wokwi]
 version=1
-firmware='build/arduino-multiplayer-pong.ino.hex'
-elf='build/arduino-multiplayer-pong.ino.elf'
+firmware='.pio/build/upesy_wroom/firmware.bin'
+elf='.pio/build/upesy_wroom/firmware.elf'
