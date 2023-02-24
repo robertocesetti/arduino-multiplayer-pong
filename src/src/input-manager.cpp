@@ -50,11 +50,11 @@ void InputManager::startReading(GameEntity *gameEntities)
 
         vertical = analogRead(VERT);
         velocityY = 0;
-        if (vertical > 700)
+        if (vertical > 3000)
         {
             velocityY = -2;
         }
-        else if (vertical < 300)
+        else if (vertical < 1000)
         {
             velocityY = 2;
         }
