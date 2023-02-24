@@ -1,16 +1,8 @@
-//#include <Arduino_FreeRTOS.h>
+// #include <Arduino_FreeRTOS.h>
 #include <Arduino.h>
-//#include <FreeRTOSConfig.h>
+// #include <FreeRTOSConfig.h>
 #include "gameEntities/game-entity.h"
 #include "game-engine.h"
-
-static StackType_t renderTaskStack[256];
-static StackType_t gameLoopTaskStack[256];
-static StackType_t inputManagerTaskStack[128];
-
-static StaticTask_t renderTaskBuffer;
-static StaticTask_t gameLoopTaskBuffer;
-static StaticTask_t inputManagerTaskBuffer; 
 
 void xTaskRender(void *params)
 {
@@ -60,37 +52,35 @@ void GameEngine::start()
 void GameEngine::createTasks()
 {
     // Create the task for the rendering
-    xTaskCreateStatic(
-        xTaskRender,      // Pointer to the task function
-        "Render",         // Task name
-        256,              // Stack size in words
-        this,             // Task parameter
-        1,                // Task priority
-        renderTaskStack,  // Pointer to the task stack
-        &renderTaskBuffer // Pointer to the task control block
-    );
+    xTaskCreate(
+        xTaskRender, // Pointer to the task function
+        "Render",    // Task name
+        4096,        // Stack size in words
+        this,        // Task parameter
+        1,           // Task priority
+        NULL
+        );
 
     // Create the task for the game loop
-    xTaskCreatePinnedToCore(
-        xTaskGameLoop,      // Pointer to the task function
-        "GameLoop",         // Task name
-        256,                // Stack size in words
-        this,               // Task parameter
-        1,                  // Task priority
-        NULL,
-        1
-    );
+    xTaskCreate(
+        xTaskGameLoop, // Pointer to the task function
+        "GameLoop",    // Task name
+        4096,           // Stack size in words
+        this,          // Task parameter
+        1,             // Task priority
+        NULL
+        );
 
     // Create the task for input management
-    xTaskCreatePinnedToCore(
-        xTaskInputManager,      // Pointer to the task function
-        "InputMgr",             // Task name
-        128,                     // Stack size in words
-        this,                   // Task parameter
-        1,                      // Task priority
-        NULL,
-        1
-    );
+    xTaskCreate(
+        xTaskInputManager, // Pointer to the task function
+        "InputMgr",        // Task name
+        4096,               // Stack size in words
+        this,              // Task parameter
+        1,                 // Task priority
+        NULL
+        );
+        
 }
 
 void GameEngine::stop()

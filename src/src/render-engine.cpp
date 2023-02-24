@@ -1,11 +1,8 @@
-//#include <Arduino_FreeRTOS.h>
-#include <U8g2lib.h>
 #include <Arduino.h>
 #include "render-engine.h"
 #include "gameEntities/game-entity.h"
 
-RenderEngine::RenderEngine() : display(U8G2_R0, /* reset=*/ U8X8_PIN_NONE), currentScene(nullptr)
- 
+RenderEngine::RenderEngine() : display(U8G2_R0, /* reset=*/U8X8_PIN_NONE), currentScene(NULL)
 {
     initDisplayProperties();
     clearDisplay();
@@ -57,7 +54,7 @@ void RenderEngine::render()
         display.firstPage();
         do
         {
-            if (currentScene != nullptr)
+            if (currentScene != NULL)
                 currentScene->render();
         } while (display.nextPage());
     }
@@ -67,19 +64,6 @@ void RenderEngine::changeScene(Scene *scene)
 {
     scene->initialize(&display, displayProperties);
     currentScene = scene;
-}
-
-void RenderEngine::displayLose()
-{
-    char strBuf[16]; // used for string formatting
-
-    // Display the "You Lose" screen
-    //display.setFont(u8g_font_gdb20r); // switch to bigger font
-    strcpy(strBuf, "TRY");
-    display.drawStr((displayProperties->width - display.getStrWidth(strBuf)) / 2, displayProperties->height / 2, strBuf);
-    strcpy(strBuf, "AGAIN!");
-    display.drawStr((displayProperties->width - display.getStrWidth(strBuf)) / 2, displayProperties->height, strBuf);
-    //display.setFont(u8g_font_profont10r); // switch back to our normal font
 }
 
 void RenderEngine::clearDisplay()

@@ -19,12 +19,12 @@
     [ "joystick1:GND", "esp:GND.2", "black", [ "v0" ] ],
     [ "joystick1:VCC", "esp:3V3", "red", [ "v223.45", "h263.13", "v-74.2" ] ],
     [ "esp:D34", "joystick1:HORZ", "green", [ "h0" ] ],
-    [ "esp:D18", "joystick1:SEL", "green", [ "h0" ] ],
-    [ "joystick1:VERT", "esp:D35", "green", [ "v0" ] ],
+    [ "esp:D18", "joystick1:SEL", "magenta", [ "h0" ] ],
+    [ "joystick1:VERT", "esp:D35", "#8f4814", [ "v0" ] ],
     [ "oled1:VCC", "esp:3V3", "red", [ "v-45.36", "h111.13", "v-74.2" ] ],
     [ "oled1:GND", "esp:GND.2", "black", [ "h-104.76", "v-129.06" ] ],
-    [ "oled1:SDA", "esp:D21", "green", [ "h141.23", "v-215.16" ] ],
-    [ "oled1:SCL", "esp:D22", "green", [ "h151.06", "v-244.06" ] ]
+    [ "oled1:SDA", "esp:D21", "orange", [ "h182.49", "v-215.16" ] ],
+    [ "oled1:SCL", "esp:D22", "gold", [ "v-26.3", "h151.06", "v-217.76" ] ]
   ],
   "dependencies": {}
 }

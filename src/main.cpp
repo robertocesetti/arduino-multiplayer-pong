@@ -8,12 +8,11 @@ GameEngine* gameEngine;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Arduino Multiplayer Pong");
 
   gameEngine = new GameEngine();
   gameEngine->start();
-
 }
 
 void loop() {}

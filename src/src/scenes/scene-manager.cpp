@@ -5,7 +5,7 @@
 #include "final-score-scene.h"
 #include "pause-scene.h"
 
-SceneManager::SceneManager(GameEntity *ge, RenderEngine *re) : gameEntities(ge), renderEngine(re)
+SceneManager::SceneManager(GameEntity *ge, RenderEngine *re): gameEntities(ge), renderEngine(re)
 {
     createScenes();
 }
