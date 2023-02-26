@@ -5,7 +5,7 @@
 #include "final-score-scene.h"
 #include "pause-scene.h"
 
-SceneManager::SceneManager(GameEntity *ge, RenderEngine *re): gameEntities(ge), renderEngine(re)
+SceneManager::SceneManager(GameEntity *ge, RenderEngine *re, GameLoop *gl) : gameEntities(ge), renderEngine(re), gameLoop(gl)
 {
     createScenes();
 }
@@ -44,6 +44,7 @@ void SceneManager::changeScene(SceneType sceneType)
             Serial.print("Change Scene: ");
             Serial.println(scene->getSceneType());
             renderEngine->changeScene(scene);
+            gameLoop->changeScene(scene);
             return;
         }
     }

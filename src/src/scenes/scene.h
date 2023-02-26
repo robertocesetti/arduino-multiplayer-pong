@@ -1,11 +1,12 @@
 #pragma once
 
-#include <U8g2lib.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 #include "../display-properties.h"
 
 enum SceneType
 {
-    GAME = 0,
+    GAME,
     SCORE,
     START,
     PAUSE
@@ -15,15 +16,17 @@ class Scene
 {
 protected:
     SceneType type;
-    U8G2_SSD1306_128X64_NONAME_1_HW_I2C *display;
+    Adafruit_SSD1306 *display;
     DisplayProperties *displayProperties;
 
 public:
     Scene();
     virtual ~Scene();
 
-    void initialize(U8G2_SSD1306_128X64_NONAME_1_HW_I2C *display, DisplayProperties *displayProperties);
+    void initialize(Adafruit_SSD1306 *display, DisplayProperties *displayProperties);
     virtual void render() = 0;
+    virtual void tick(){};
+    virtual bool useTick() { return false; }
 
-    SceneType getSceneType() {return type;}
+    SceneType getSceneType() { return type; }
 };

@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "src/game-engine.h"
+#include "src/game-task-manager.h"
 
 GameEngine* gameEngine;
 
@@ -15,7 +16,9 @@ void setup()
   gameEngine->start();
 }
 
-void loop() {}
+void loop() {
+}
+
 
 /*
 Interfaces:

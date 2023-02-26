@@ -2,10 +2,9 @@
 #include "render-engine.h"
 #include "gameEntities/game-entity.h"
 
-RenderEngine::RenderEngine() : display(U8G2_R0, /* reset=*/U8X8_PIN_NONE), currentScene(NULL)
+RenderEngine::RenderEngine() : display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET), currentScene(NULL)
 {
     initDisplayProperties();
-    clearDisplay();
 }
 
 RenderEngine::~RenderEngine()
@@ -14,25 +13,32 @@ RenderEngine::~RenderEngine()
 
 void RenderEngine::initDisplayProperties()
 {
-    display.begin();
-    int w = display.getWidth();
-    int h = display.getHeight();
+    // initialize the OLED object
+    if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
+    {
+        Serial.println(F("SSD1306 allocation failed"));
+        for (;;)
+            ; // Don't proceed, loop forever
+    }
+
+    // clear the display
+    display.clearDisplay();
 
     displayProperties = new DisplayProperties;
-    displayProperties->width = w;
-    displayProperties->height = h;
+    displayProperties->width = SCREEN_WIDTH;
+    displayProperties->height = SCREEN_HEIGHT;
 
     displayProperties->topLeftX = 0;
     displayProperties->topLeftY = 0;
 
-    displayProperties->topRightX = w - 1;
+    displayProperties->topRightX = SCREEN_WIDTH - 1;
     displayProperties->topRightY = 0;
 
     displayProperties->bottomLeftX = 0;
-    displayProperties->bottomLeftY = h - 1;
+    displayProperties->bottomLeftY = SCREEN_HEIGHT - 1;
 
-    displayProperties->bottomRightX = w - 1;
-    displayProperties->bottomRightY = h - 1;
+    displayProperties->bottomRightX = SCREEN_WIDTH - 1;
+    displayProperties->bottomRightY = SCREEN_HEIGHT - 1;
 }
 
 void RenderEngine::render()
@@ -51,12 +57,10 @@ void RenderEngine::render()
             fps = 0;
         }
 
-        display.firstPage();
-        do
-        {
-            if (currentScene != NULL)
-                currentScene->render();
-        } while (display.nextPage());
+        display.clearDisplay();
+        if (currentScene != NULL)
+            currentScene->render();
+        display.display();
     }
 }
 
@@ -64,13 +68,4 @@ void RenderEngine::changeScene(Scene *scene)
 {
     scene->initialize(&display, displayProperties);
     currentScene = scene;
-}
-
-void RenderEngine::clearDisplay()
-{
-    // Clear the screen
-    display.firstPage();
-    do
-    {
-    } while (display.nextPage());
 }

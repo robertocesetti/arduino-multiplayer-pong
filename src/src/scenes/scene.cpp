@@ -9,7 +9,7 @@ Scene::~Scene()
 {
 }
 
-void Scene::initialize(U8G2_SSD1306_128X64_NONAME_1_HW_I2C *display, DisplayProperties *displayProperties)
+void Scene::initialize(Adafruit_SSD1306 *display, DisplayProperties *displayProperties)
 {
     this->display = display;
     this->displayProperties = displayProperties;

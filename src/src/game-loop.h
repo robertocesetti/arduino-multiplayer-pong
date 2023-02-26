@@ -7,6 +7,7 @@ class GameLoop
 {
 private:
     DisplayProperties* displayProperties;
+    Scene* currentScene;
 
     void tick(Ball* ball, Paddle* paddle1, Paddle* paddle2);
     void moveUsingAI(Paddle* paddle, Ball* ball, bool godMode = false);
@@ -18,5 +19,6 @@ public:
     
     void update(GameEntity *gameEntities);
     void setDisplayProperties(DisplayProperties* displayProperties) { this->displayProperties = displayProperties; }
+    void changeScene(Scene* scene);
 };
 

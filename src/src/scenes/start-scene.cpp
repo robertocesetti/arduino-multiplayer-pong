@@ -9,10 +9,15 @@ StartScene::~StartScene()
 {
 }
 
-char strBuf[17]; // used for string formatting
-
 void StartScene::render()
 {
+    display->setTextSize(2); // Draw 2X-scale text
+    display->setTextColor(SSD1306_WHITE);
+    display->setCursor(10, 0);
+    display->println(F("START!"));
+    /*
+    char strBuf[17]; // used for string formatting
+
     display->setFont(u8g2_font_t0_14b_me); // switch to bigger font
     strcpy(strBuf, "START");
     display->drawStr((displayProperties->width - display->getStrWidth(strBuf)) / 2, displayProperties->height / 2, strBuf);
@@ -20,4 +25,5 @@ void StartScene::render()
     strcpy(strBuf, "Press the button");
     display->drawStr((displayProperties->width - display->getStrWidth(strBuf)) / 2, displayProperties->height, strBuf);
     display->setFont(u8g2_font_t0_14b_me); // switch back to our normal font
+    */
 }
