@@ -80,6 +80,8 @@ void GameScene::render()
     drawBall();
     drawPaddle(gameEntities->getPaddle1());
     drawPaddle(gameEntities->getPaddle2());
+
+    Scene::render();
 }
 
 void GameScene::drawBorder()

@@ -4,6 +4,7 @@
 #include "game-scene.h"
 #include "final-score-scene.h"
 #include "pause-scene.h"
+#include "../game-task-manager.h"
 
 SceneManager::SceneManager(GameEntity *ge, RenderEngine *re, GameLoop *gl) : gameEntities(ge), renderEngine(re), gameLoop(gl)
 {
@@ -45,6 +46,9 @@ void SceneManager::changeScene(SceneType sceneType)
             Serial.println(scene->getSceneType());
             renderEngine->changeScene(scene);
             gameLoop->changeScene(scene);
+
+            Serial.printf("Try to suspend %s, from status %i\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.inputTaskHandler), eTaskGetState(GameTaskManager::getInstance()->tasks.inputTaskHandler));
+
             return;
         }
     }

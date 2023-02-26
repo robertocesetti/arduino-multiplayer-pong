@@ -1,6 +1,6 @@
 #pragma once
 
-//#include <Arduino_FreeRTOS.h>
+// #include <Arduino_FreeRTOS.h>
 #include "gameEntities/paddle.h"
 #include "gameEntities/ball.h"
 #include "render-engine.h"
@@ -23,13 +23,14 @@ private:
 public:
     GameEngine();
     ~GameEngine();
+
     void start();
     void stop();
-    
-    bool isRunning(){return running;}
-    GameLoop* getGameLoopHandler(){return &gameLoop;}
-    RenderEngine* getRenderEngine(){return &renderEngine;}
-    GameEntity* getGameEntity(){return &gameEntity;}
-    InputManager* getInputManager(){return &inputManager;}
-    SceneManager* getSceneManager(){return &sceneManager;}
+
+    bool isRunning() { return running; }
+    GameLoop *getGameLoopHandler() { return &gameLoop; }
+    RenderEngine *getRenderEngine() { return &renderEngine; }
+    GameEntity *getGameEntity() { return &gameEntity; }
+    InputManager *getInputManager() { return &inputManager; }
+    SceneManager *getSceneManager() { return &sceneManager; }
 };

@@ -29,7 +29,6 @@ void xTaskNetwork(void *params)
     Serial.println(F("Starting task 'xTaskNetwork'"));
     while (true)
     {
-       
     }
 }
 
@@ -58,7 +57,7 @@ void GameEngine::start()
 
 void GameEngine::createTasks()
 {
-    
+
     // Create the task for the rendering
     xTaskCreatePinnedToCore(
         xTaskRender, // Pointer to the task function
@@ -66,10 +65,10 @@ void GameEngine::createTasks()
         4096,        // Stack size in words
         this,        // Task parameter
         1,           // Task priority
-        GameTaskManager::getInstance()->getRenderTaskHandler(),
+        &GameTaskManager::getInstance()->tasks.renderTaskHandler,
         1);
 
-    //Serial.println(eTaskGetState(GameTaskManager::getInstance()->getRenderTaskHandler()));
+    // Serial.println(eTaskGetState(GameTaskManager::getInstance()->getRenderTaskHandler()));
 
     // Create the task for input management
     xTaskCreatePinnedToCore(
@@ -78,7 +77,7 @@ void GameEngine::createTasks()
         4096,              // Stack size in words
         this,              // Task parameter
         1,                 // Task priority
-        GameTaskManager::getInstance()->getInputTaskHandler(),
+        &GameTaskManager::getInstance()->tasks.inputTaskHandler,
         1);
 
     // Create the task for the game loop
@@ -88,7 +87,7 @@ void GameEngine::createTasks()
         4096,          // Stack size in words
         this,          // Task parameter
         1,             // Task priority
-        GameTaskManager::getInstance()->getGameLoopTaskHandler(),
+        &GameTaskManager::getInstance()->tasks.gameLoopTaskHandler,
         1);
 
     // Create the task for the game loop
@@ -98,10 +97,8 @@ void GameEngine::createTasks()
         4096,         // Stack size in words
         this,         // Task parameter
         1,            // Task priority
-        GameTaskManager::getInstance()->getNetworkTaskHandler(),
+        &GameTaskManager::getInstance()->tasks.networkTaskHandler,
         1);
-
-    
 }
 
 void GameEngine::stop()

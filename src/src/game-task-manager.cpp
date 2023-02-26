@@ -10,21 +10,5 @@ GameTaskManager *GameTaskManager::getInstance() {
     return instance;
 }
 
-TaskHandle_t* GameTaskManager::getGameLoopTaskHandler() {
-    return &gameLoopTaskHandler;
-}
-
-TaskHandle_t* GameTaskManager::getRenderTaskHandler() {
-    return &renderTaskHandler;
-}
-
-TaskHandle_t* GameTaskManager::getInputTaskHandler() {
-    return &inputTaskHandler;
-}
-
-TaskHandle_t* GameTaskManager::getNetworkTaskHandler() {
-    return &networkTaskHandler;
-}
-
 // Define the global GameTaskManagerInstance variable
 GameTaskManager* GameTaskManagerInstance = GameTaskManager::getInstance();

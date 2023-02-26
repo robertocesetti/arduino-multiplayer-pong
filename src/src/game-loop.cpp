@@ -70,16 +70,16 @@ void GameLoop::changeScene(Scene *scene)
 
     if (scene->useTick())
     {
-        Serial.println("RESUME Gameloop");
-        vTaskResume(GameTaskManager::getInstance()->getGameLoopTaskHandler());
+        Serial.printf("Try to resume %s, from status %i\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.gameLoopTaskHandler), eTaskGetState(GameTaskManager::getInstance()->tasks.gameLoopTaskHandler));
+        vTaskResume(GameTaskManager::getInstance()->tasks.gameLoopTaskHandler);
     }
     else
     {
-        Serial.println("SUSPEND Gameloop");
-        //vTaskSuspend(GameTaskManager::getInstance()->getGameLoopTaskHandler());
+        Serial.printf("Try to suspend %s, from status %i\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.gameLoopTaskHandler), eTaskGetState(GameTaskManager::getInstance()->tasks.gameLoopTaskHandler));
+        vTaskSuspend(GameTaskManager::getInstance()->tasks.gameLoopTaskHandler);
     }
-    //Serial.println("AFTER");
-    //Serial.println(eTaskGetState(GameTaskManager::getInstance()->getGameLoopTaskHandler()));
+    // Serial.println("AFTER");
+    // Serial.println(eTaskGetState(GameTaskManager::getInstance()->getGameLoopTaskHandler()));
 
     currentScene = scene;
 }

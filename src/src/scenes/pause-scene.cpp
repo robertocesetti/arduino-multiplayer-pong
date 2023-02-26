@@ -17,6 +17,8 @@ void PauseScene::render()
     display->setTextColor(SSD1306_WHITE);
     display->setCursor(10, 0);
     display->println(F("PAUSE"));
+
+    Scene::render();
     /*
         char strBuf[20]; // used for string formatting
 

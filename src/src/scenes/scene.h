@@ -18,6 +18,7 @@ protected:
     SceneType type;
     Adafruit_SSD1306 *display;
     DisplayProperties *displayProperties;
+    bool rendered;
 
 public:
     Scene();
@@ -27,7 +28,7 @@ public:
     virtual void render() = 0;
     virtual void tick(){};
     virtual bool useTick() { return false; }
-    virtual bool renderOnce() { return true; }
+    virtual bool renderOnce() { return rendered; }
 
     SceneType getSceneType() { return type; }
 };

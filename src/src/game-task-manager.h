@@ -3,22 +3,24 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-class GameTaskManager {
-private:
+struct GameTaskManagerTest
+{
     TaskHandle_t gameLoopTaskHandler;
     TaskHandle_t renderTaskHandler;
     TaskHandle_t inputTaskHandler;
     TaskHandle_t networkTaskHandler;
+};
+
+class GameTaskManager
+{
+private:
     static GameTaskManager *instance;
-    GameTaskManager() {};
+    GameTaskManager(){};
 
 public:
+    GameTaskManagerTest tasks;
     static GameTaskManager *getInstance();
-    TaskHandle_t* getGameLoopTaskHandler();
-    TaskHandle_t* getRenderTaskHandler();
-    TaskHandle_t* getInputTaskHandler();
-    TaskHandle_t* getNetworkTaskHandler();
 };
 
 // Declare instance as a global variable, with external linkage
-extern GameTaskManager* GameTaskManagerInstance;
+extern GameTaskManager *GameTaskManagerInstance;

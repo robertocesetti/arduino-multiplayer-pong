@@ -13,4 +13,10 @@ void Scene::initialize(Adafruit_SSD1306 *display, DisplayProperties *displayProp
 {
     this->display = display;
     this->displayProperties = displayProperties;
+    this->rendered = false;
+}
+
+void Scene::render()
+{
+    rendered = true;
 }

@@ -17,6 +17,8 @@ void FinalScoreScene::render()
     display->setTextColor(SSD1306_WHITE);
     display->setCursor(10, 0);
     display->println(F("TRY AGAIN!"));
+    Scene::render();
+
     /*
         char strBuf[16]; // used for string formatting
         // Display the "You Lose" screen
