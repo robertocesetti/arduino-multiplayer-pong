@@ -27,8 +27,16 @@ void xTaskInputManager(void *params)
 void xTaskNetwork(void *params)
 {
     Serial.println(F("Starting task 'xTaskNetwork'"));
+    GameTaskManagerTest* tasks = &GameTaskManager::getInstance()->tasks;
+
     while (true)
     {
+        Serial.printf("Status of %s: %i\n", pcTaskGetName(tasks->inputTaskHandler), eTaskGetState(tasks->inputTaskHandler));
+        Serial.printf("Status of %s: %i\n", pcTaskGetName(tasks->gameLoopTaskHandler), eTaskGetState(tasks->gameLoopTaskHandler));
+        //Serial.printf("Status of %s: %i\n", pcTaskGetName(tasks->networkTaskHandler), eTaskGetState(tasks->inputTaskHandler));
+        Serial.printf("Status of %s: %i\n", pcTaskGetName(tasks->renderTaskHandler), eTaskGetState(tasks->renderTaskHandler));
+
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
 
@@ -86,7 +94,7 @@ void GameEngine::createTasks()
         "GameLoop",    // Task name
         4096,          // Stack size in words
         this,          // Task parameter
-        1,             // Task priority
+        2,             // Task priority
         &GameTaskManager::getInstance()->tasks.gameLoopTaskHandler,
         1);
 

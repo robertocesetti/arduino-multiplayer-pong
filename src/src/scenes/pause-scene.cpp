@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-PauseScene::PauseScene(/* args */)
+PauseScene::PauseScene(GameEntity *ge) : gameEntities(ge)
 {
     type = PAUSE;
 }
@@ -17,6 +17,11 @@ void PauseScene::render()
     display->setTextColor(SSD1306_WHITE);
     display->setCursor(10, 0);
     display->println(F("PAUSE"));
+
+    unsigned int ballX = gameEntities->getBall()->getPositionX();
+    unsigned int ballY = gameEntities->getBall()->getPositionY();
+    unsigned int ballR = gameEntities->getBall()->getRadius();
+    display->fillCircle(ballX, ballY, ballR, WHITE);
 
     Scene::render();
     /*

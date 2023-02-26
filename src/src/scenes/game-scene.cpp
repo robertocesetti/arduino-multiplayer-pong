@@ -23,6 +23,7 @@ GameScene::~GameScene()
 
 void GameScene::tick()
 {
+    //Serial.println("<--GameTick-->");
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
     Paddle *paddle2 = gameEntities->getPaddle2();

@@ -1,13 +1,15 @@
 #pragma once
 
+#include "../gameEntities/game-entity.h"
 #include "scene.h"
 
 class PauseScene : public Scene
 {
 private:
-    /* data */
+    GameEntity *gameEntities;
+
 public:
-    PauseScene(/* args */);
+    PauseScene(GameEntity *gameEntities);
     ~PauseScene();
 
     void render() override;

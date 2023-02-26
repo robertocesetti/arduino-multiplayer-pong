@@ -20,7 +20,7 @@ void SceneManager::createScenes()
     auto gs = new GameScene(gameEntities);
     auto fs = new FinalScoreScene();
     auto ss = new StartScene();
-    auto ps = new PauseScene();
+    auto ps = new PauseScene(gameEntities);
 
     scenes[0] = gs;
     scenes[1] = fs;
@@ -47,7 +47,7 @@ void SceneManager::changeScene(SceneType sceneType)
             renderEngine->changeScene(scene);
             gameLoop->changeScene(scene);
 
-            Serial.printf("Try to suspend %s, from status %i\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.inputTaskHandler), eTaskGetState(GameTaskManager::getInstance()->tasks.inputTaskHandler));
+            //Serial.printf("Try to suspend %s, from status %i\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.inputTaskHandler), eTaskGetState(GameTaskManager::getInstance()->tasks.inputTaskHandler));
 
             return;
         }
