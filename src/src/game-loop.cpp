@@ -50,8 +50,7 @@ void GameLoop::update(GameEntity *gameEntities)
         if (current - lastCheck >= 1000)
         {
             lastCheck = current;
-            Serial.print(F("-UPS: "));
-            Serial.println(ups);
+            Serial.printf("UPS: %i\n", ups);
             ups = 0;
         }
 
@@ -61,11 +60,13 @@ void GameLoop::update(GameEntity *gameEntities)
 
 void GameLoop::changeScene(Scene *scene)
 {
+    /*
     Serial.println(scene->getSceneType());
     Serial.println(scene->useTick());
     Serial.println("BEFORE");
     Serial.printf("Pointer address: %p", GameTaskManager::getInstance()->getGameLoopTaskHandler());
     Serial.println(eTaskGetState(GameTaskManager::getInstance()->getGameLoopTaskHandler()));
+    */
 
     if (scene->useTick())
     {
@@ -75,13 +76,10 @@ void GameLoop::changeScene(Scene *scene)
     else
     {
         Serial.println("SUSPEND Gameloop");
-        /*vTaskSuspend(GameTaskManager::getInstance()->getRenderTaskHandler());
-        vTaskSuspend(GameTaskManager::getInstance()->getGameLoopTaskHandler());
-        vTaskSuspend(GameTaskManager::getInstance()->getInputTaskHandler());
-        vTaskSuspend(GameTaskManager::getInstance()->getNetworkTaskHandler());*/
+        //vTaskSuspend(GameTaskManager::getInstance()->getGameLoopTaskHandler());
     }
-    Serial.println("AFTER");
-    Serial.println(eTaskGetState(GameTaskManager::getInstance()->getGameLoopTaskHandler()));
+    //Serial.println("AFTER");
+    //Serial.println(eTaskGetState(GameTaskManager::getInstance()->getGameLoopTaskHandler()));
 
     currentScene = scene;
 }

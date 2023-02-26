@@ -1,8 +1,9 @@
 #include <Arduino.h>
 #include "render-engine.h"
 #include "gameEntities/game-entity.h"
+#include "game-task-manager.h"
 
-RenderEngine::RenderEngine() : display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET), currentScene(NULL)
+RenderEngine::RenderEngine() : display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET), currentScene(nullptr)
 {
     initDisplayProperties();
 }
@@ -51,16 +52,19 @@ void RenderEngine::render()
         fps++;
         if (millis() > lastTime + 1000)
         {
-            Serial.print("FPS: ");
-            Serial.println(fps);
+            Serial.printf("FPS: %i\n", fps);
             lastTime = millis();
             fps = 0;
         }
 
         display.clearDisplay();
-        if (currentScene != NULL)
+        if (currentScene != nullptr)
             currentScene->render();
         display.display();
+
+        if(currentScene != nullptr && currentScene->renderOnce()){
+            vTaskSuspend(NULL);
+        }
     }
 }
 
@@ -68,4 +72,5 @@ void RenderEngine::changeScene(Scene *scene)
 {
     scene->initialize(&display, displayProperties);
     currentScene = scene;
+    vTaskResume(GameTaskManager::getInstance()->getRenderTaskHandler());
 }

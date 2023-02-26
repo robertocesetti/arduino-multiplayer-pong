@@ -21,4 +21,5 @@ public:
     void render() override;
     void tick() override;
     bool useTick() override { return true; }
+    bool renderOnce() override { return false; }
 };

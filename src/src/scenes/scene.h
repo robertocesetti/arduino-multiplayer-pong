@@ -27,6 +27,7 @@ public:
     virtual void render() = 0;
     virtual void tick(){};
     virtual bool useTick() { return false; }
+    virtual bool renderOnce() { return true; }
 
     SceneType getSceneType() { return type; }
 };

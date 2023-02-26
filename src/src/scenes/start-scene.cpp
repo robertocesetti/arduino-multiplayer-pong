@@ -103,12 +103,12 @@ StartScene::~StartScene()
 void StartScene::render()
 {
     display->drawXBitmap(0, 0, IMG, 64, 64, SSD1306_WHITE);
-    /*
+    
     display->setTextSize(2); // Draw 2X-scale text
     display->setTextColor(SSD1306_WHITE);
-    display->setCursor(10, 0);
+    display->setCursor(65, 28);
     display->println(F("START!"));
-    */
+    
 
     /*
     char strBuf[17]; // used for string formatting
