@@ -75,7 +75,7 @@ void GameScene::render()
 {
     drawBorder();
 
-    display->drawBitmap(64, 0, DOTTED_LINE, 1, 64, SSD1306_WHITE);
+    display->drawXBitmap(64, 0, DOTTED_LINE, 1, 64, SSD1306_WHITE);
 
     drawBall();
     drawPaddle(gameEntities->getPaddle1());
