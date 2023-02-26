@@ -9,7 +9,10 @@ struct GameTaskManagerTest
     TaskHandle_t renderTaskHandler;
     TaskHandle_t inputTaskHandler;
     TaskHandle_t networkTaskHandler;
+    TaskHandle_t statusTaskHandler;
 };
+
+const String STATE_NAMES[] = {"eRunning", "eReady", "eBlocked", "eSuspended", "eDeleted", "eInvalid"};
 
 class GameTaskManager
 {
@@ -20,6 +23,8 @@ private:
 public:
     GameTaskManagerTest tasks;
     static GameTaskManager *getInstance();
+
+    void printTasksStatus();
 };
 
 // Declare instance as a global variable, with external linkage

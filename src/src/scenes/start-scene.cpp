@@ -109,7 +109,7 @@ void StartScene::render()
     display->setCursor(65, 28);
     display->println(F("START!"));
     
-
+    Scene::render();
     /*
     char strBuf[17]; // used for string formatting
 

@@ -20,7 +20,7 @@ void SceneManager::createScenes()
     auto gs = new GameScene(gameEntities);
     auto fs = new FinalScoreScene();
     auto ss = new StartScene();
-    auto ps = new PauseScene(gameEntities);
+    auto ps = new PauseScene();
 
     scenes[0] = gs;
     scenes[1] = fs;

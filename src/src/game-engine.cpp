@@ -27,16 +27,24 @@ void xTaskInputManager(void *params)
 void xTaskNetwork(void *params)
 {
     Serial.println(F("Starting task 'xTaskNetwork'"));
-    GameTaskManagerTest* tasks = &GameTaskManager::getInstance()->tasks;
-
     while (true)
     {
-        Serial.printf("Status of %s: %i\n", pcTaskGetName(tasks->inputTaskHandler), eTaskGetState(tasks->inputTaskHandler));
-        Serial.printf("Status of %s: %i\n", pcTaskGetName(tasks->gameLoopTaskHandler), eTaskGetState(tasks->gameLoopTaskHandler));
-        //Serial.printf("Status of %s: %i\n", pcTaskGetName(tasks->networkTaskHandler), eTaskGetState(tasks->inputTaskHandler));
-        Serial.printf("Status of %s: %i\n", pcTaskGetName(tasks->renderTaskHandler), eTaskGetState(tasks->renderTaskHandler));
-
         vTaskDelay(pdMS_TO_TICKS(5000));
+    }
+}
+
+void xTaskStatus(void *params)
+{
+    Serial.println(F("Starting task 'xTaskStatus'"));
+    GameTaskManager *gmt = GameTaskManager::getInstance();
+    while (true)
+    {
+        Serial.print(F("\n\n------ APP STATUS ------\n"));
+        gmt->printTasksStatus();
+        Serial.printf("Memory heap: %i (used) / %i (total)\n", ESP.getFreeHeap(), ESP.getHeapSize());
+        Serial.printf("Sketch space: %i (used) / %i (available)\n", ESP.getSketchSize(), ESP.getFreeSketchSpace());
+        Serial.print(F("------------------------\n\n\n"));
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 
@@ -94,11 +102,11 @@ void GameEngine::createTasks()
         "GameLoop",    // Task name
         4096,          // Stack size in words
         this,          // Task parameter
-        2,             // Task priority
+        1,             // Task priority => was 2
         &GameTaskManager::getInstance()->tasks.gameLoopTaskHandler,
         1);
 
-    // Create the task for the game loop
+    // Create the task for the network loop
     xTaskCreatePinnedToCore(
         xTaskNetwork, // Pointer to the task function
         "NetLoop",    // Task name
@@ -106,6 +114,16 @@ void GameEngine::createTasks()
         this,         // Task parameter
         1,            // Task priority
         &GameTaskManager::getInstance()->tasks.networkTaskHandler,
+        1);
+
+    // Create the task for printing the status
+    xTaskCreatePinnedToCore(
+        xTaskStatus, // Pointer to the task function
+        "StatLoop",  // Task name
+        4096,        // Stack size in words
+        this,        // Task parameter
+        1,           // Task priority
+        &GameTaskManager::getInstance()->tasks.statusTaskHandler,
         1);
 }
 

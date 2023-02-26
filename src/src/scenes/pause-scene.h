@@ -6,11 +6,15 @@
 class PauseScene : public Scene
 {
 private:
-    GameEntity *gameEntities;
+    unsigned long lastTime = 0; 
+    bool drawPlayImage = true;
 
 public:
-    PauseScene(GameEntity *gameEntities);
+    PauseScene();
     ~PauseScene();
 
     void render() override;
+    void tick() override;
+    bool useTick() override { return true; }
+    bool renderOnce() override { return false; }
 };

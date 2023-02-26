@@ -71,7 +71,7 @@ void RenderEngine::render()
 
         if (currentScene != nullptr && currentScene->renderOnce())
         {
-            Serial.printf("Try to suspend %s, from status %i\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.renderTaskHandler), eTaskGetState(GameTaskManager::getInstance()->tasks.renderTaskHandler));
+            Serial.printf("Try to suspend %s, from status %s\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.renderTaskHandler), STATE_NAMES[eTaskGetState(GameTaskManager::getInstance()->tasks.renderTaskHandler)]);
             vTaskSuspend(GameTaskManager::getInstance()->tasks.renderTaskHandler);
         }
     }
@@ -82,7 +82,7 @@ void RenderEngine::changeScene(Scene *scene)
     scene->initialize(&display, displayProperties);
     currentScene = scene;
 
-    Serial.printf("Try to resume %s, from status %i\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.renderTaskHandler), eTaskGetState(GameTaskManager::getInstance()->tasks.renderTaskHandler));
+    Serial.printf("Try to resume %s, from status %s\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.renderTaskHandler), STATE_NAMES[eTaskGetState(GameTaskManager::getInstance()->tasks.renderTaskHandler)]);
 
     vTaskResume(GameTaskManager::getInstance()->tasks.renderTaskHandler);
 }
