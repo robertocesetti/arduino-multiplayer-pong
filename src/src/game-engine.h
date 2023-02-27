@@ -6,6 +6,7 @@
 #include "render-engine.h"
 #include "game-loop.h"
 #include "input-manager.h"
+#include "network-manager.h"
 #include "scenes/scene-manager.h"
 
 class GameEngine
@@ -17,6 +18,7 @@ private:
     GameLoop gameLoop;
     InputManager inputManager;
     SceneManager sceneManager;
+    NetworkManager networkManager;
 
     void createTasks();
 
@@ -32,5 +34,6 @@ public:
     RenderEngine *getRenderEngine() { return &renderEngine; }
     GameEntity *getGameEntity() { return &gameEntity; }
     InputManager *getInputManager() { return &inputManager; }
+    NetworkManager *getNetworkManager() { return &networkManager; }
     SceneManager *getSceneManager() { return &sceneManager; }
 };

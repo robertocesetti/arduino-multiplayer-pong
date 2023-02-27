@@ -27,10 +27,8 @@ void xTaskInputManager(void *params)
 void xTaskNetwork(void *params)
 {
     Serial.println(F("Starting task 'xTaskNetwork'"));
-    while (true)
-    {
-        vTaskDelay(pdMS_TO_TICKS(5000));
-    }
+    GameEngine *engine = static_cast<GameEngine *>(params);
+    engine->getNetworkManager()->receiveData();
 }
 
 void xTaskStatus(void *params)
@@ -48,10 +46,10 @@ void xTaskStatus(void *params)
     }
 }
 
-GameEngine::GameEngine() : running(false), 
+GameEngine::GameEngine() : running(false),
 
-    sceneManager(&gameEntity, &renderEngine, &gameLoop), 
-    inputManager(&sceneManager)
+                           sceneManager(&gameEntity, &renderEngine, &gameLoop),
+                           inputManager(&sceneManager)
 {
     RenderEngine *renderEngine = getRenderEngine();
     gameLoop.setDisplayProperties(renderEngine->getDisplayProperties());
@@ -71,7 +69,7 @@ void GameEngine::start()
 
     // TODO: network.init()
     createTasks();
-    
+
     gameEntity.resetGame();
     sceneManager.changeScene(START);
 }

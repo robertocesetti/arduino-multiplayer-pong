@@ -4,7 +4,7 @@
 #include "scene-manager.h"
 #include "scene.h"
 
-#define MAX_SCORE 2
+#define MAX_SCORE 1
 
 class GameScene : public Scene
 {
