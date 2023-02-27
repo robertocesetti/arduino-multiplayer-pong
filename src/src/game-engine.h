@@ -18,7 +18,6 @@ private:
     GameLoop gameLoop;
     InputManager inputManager;
     SceneManager sceneManager;
-    NetworkManager networkManager;
 
     void createTasks();
 
@@ -34,6 +33,5 @@ public:
     RenderEngine *getRenderEngine() { return &renderEngine; }
     GameEntity *getGameEntity() { return &gameEntity; }
     InputManager *getInputManager() { return &inputManager; }
-    NetworkManager *getNetworkManager() { return &networkManager; }
     SceneManager *getSceneManager() { return &sceneManager; }
 };

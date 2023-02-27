@@ -1,29 +1,47 @@
 #include "network-manager.h"
 #include "WiFi.h"
 
-#include "BluetoothSerial.h"
+NetworkManager *NetworkManager::instance = nullptr;
 
 NetworkManager::NetworkManager()
 {
     WiFi.mode(WIFI_MODE_STA);
     myMAC = WiFi.macAddress();
     master = strcmp(stringify(MAC_1), myMAC.c_str()) == 0;
-    if (master)
-    {
-        serialBT.begin("ESP32-master");
-    }
-    else
-    {
-        serialBT.begin("ESP32-slave");
-    }
+
+    char macStr[18];
+    sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", myMAC[0], myMAC[1], myMAC[2], myMAC[3], myMAC[4], myMAC[5]);
+    Serial.printf("My MAC address: %s, Am I the master? %s\n", macStr, (master ? "yes" : "no"));
 }
 
 NetworkManager::~NetworkManager()
 {
 }
 
+void NetworkManager::startCommunication()
+{
+    while (true)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+NetworkManager *NetworkManager::getInstance()
+{
+    if (instance == nullptr)
+    {
+        instance = new NetworkManager();
+    }
+    return instance;
+}
+
 void NetworkManager::initialize(void)
 {
+    instance = getInstance();
+
+    if (instance->initialized)
+        return;
+
     // Init ESP-NOW
     if (esp_now_init() != ESP_OK)
     {
@@ -33,22 +51,24 @@ void NetworkManager::initialize(void)
 
     // Once ESPNow is successfully Init, we will register for Send CB to
     // get the status of Trasnmitted paket
-    // esp_now_register_send_cb(onDataRecv);
+    esp_now_register_send_cb(onDataSent);
 
     // Register peer
-    memcpy(peerInfo.peer_addr, getOtherMAC(), 6);
-    peerInfo.channel = 0;
-    peerInfo.encrypt = false;
+    memcpy(instance->peerInfo.peer_addr, instance->getOtherMAC(), 6);
+    instance->peerInfo.channel = 0;
+    instance->peerInfo.encrypt = false;
 
     // Add peer
-    if (esp_now_add_peer(&peerInfo) != ESP_OK)
+    if (esp_now_add_peer(&(instance->peerInfo)) != ESP_OK)
     {
         Serial.println("Failed to add peer");
         return;
     }
 
     //  Register for a callback function that will be called when data is received
-    //esp_now_register_recv_cb(onDataRecv);
+    esp_now_register_recv_cb(onDataRecv);
+
+    instance->initialized = true;
 }
 
 // Callback when data is sent
@@ -75,24 +95,4 @@ void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, in
     // incomingTemp = incomingReadings.temp;
     // incomingHum = incomingReadings.hum;
     // incomingPres = incomingReadings.pres;
-}
-
-void NetworkManager::receiveData(void)
-{
-    while (true)
-    {
-        if (serialBT.available())
-        {
-            Serial.print("From BT: ");
-            Serial.println(serialBT.read());
-            sendData(nullptr);
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(20));
-    }
-}
-
-void NetworkManager::sendData(void *data)
-{
-    serialBT.write('a');
 }
