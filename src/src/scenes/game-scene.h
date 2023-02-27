@@ -1,21 +1,27 @@
 #pragma once
 
 #include "../gameEntities/game-entity.h"
+#include "scene-manager.h"
 #include "scene.h"
+
+#define MAX_SCORE 2
 
 class GameScene : public Scene
 {
 private:
-    GameEntity *gameEntities;
+    SceneManager* sceneManager;
+    GameEntity* gameEntities;
 
+    void addPoint(Paddle *paddle);
     // void moveUsingAI(Paddle *paddle, bool godMode);
 
     void drawBorder();
     void drawBall();
     void drawPaddle(Paddle *paddle);
+    void drawScore();
 
 public:
-    GameScene(GameEntity *gameEntities);
+    GameScene(SceneManager* sceneManager, GameEntity *gameEntities);
     ~GameScene();
 
     void render() override;

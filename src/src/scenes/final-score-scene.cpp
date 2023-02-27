@@ -15,7 +15,7 @@ void FinalScoreScene::render()
 {
     display->setTextSize(2); // Draw 2X-scale text
     display->setTextColor(SSD1306_WHITE);
-    display->setCursor(10, 0);
+    display->setCursor(10, 20);
     display->println(F("TRY AGAIN!"));
     Scene::render();
 

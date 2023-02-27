@@ -48,7 +48,10 @@ void xTaskStatus(void *params)
     }
 }
 
-GameEngine::GameEngine() : running(false), sceneManager(&gameEntity, &renderEngine, &gameLoop), inputManager(&sceneManager)
+GameEngine::GameEngine() : running(false), 
+
+    sceneManager(&gameEntity, &renderEngine, &gameLoop), 
+    inputManager(&sceneManager)
 {
     RenderEngine *renderEngine = getRenderEngine();
     gameLoop.setDisplayProperties(renderEngine->getDisplayProperties());
@@ -68,6 +71,8 @@ void GameEngine::start()
 
     // TODO: network.init()
     createTasks();
+    
+    gameEntity.resetGame();
     sceneManager.changeScene(START);
 }
 

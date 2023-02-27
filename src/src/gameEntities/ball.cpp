@@ -9,16 +9,16 @@ Ball::~Ball()
 {
 }
 
-bool Ball::collideWithBoard(DisplayProperties *displayProperties)
+Collision Ball::collideWithBoard(DisplayProperties *displayProperties)
 {
-    bool collide = false;
+    Collision collide = NONE;
 
     // Check for collisions with the top of the screen
     if ((positionY - RADIUS - 1) < displayProperties->topLeftY)
     {
         positionY = displayProperties->topLeftY + RADIUS + 1;
         reverseVelocityY();
-        collide = true;
+        collide = BOARD;
     }
 
     // Check for collisions with the bottom of the screen
@@ -26,7 +26,7 @@ bool Ball::collideWithBoard(DisplayProperties *displayProperties)
     {
         positionY = displayProperties->bottomLeftY - RADIUS - 1;
         reverseVelocityY();
-        collide = true;
+        collide = BOARD;
     }
 
     // Check for collisions with the left of the screen
@@ -34,7 +34,7 @@ bool Ball::collideWithBoard(DisplayProperties *displayProperties)
     {
         positionX = displayProperties->topLeftX + RADIUS + 1;
         reverseVelocityX();
-        collide = true;
+        collide = LEFT;
     }
 
     // Check for collisions with the right of the screen
@@ -42,7 +42,7 @@ bool Ball::collideWithBoard(DisplayProperties *displayProperties)
     {
         positionX = displayProperties->topRightX - RADIUS - 1;
         reverseVelocityX();
-        collide = true;
+        collide = RIGTH;
     }
 
     return collide;

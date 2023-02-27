@@ -17,7 +17,7 @@ SceneManager::~SceneManager()
 
 void SceneManager::createScenes()
 {
-    auto gs = new GameScene(gameEntities);
+    auto gs = new GameScene(this, gameEntities);
     auto fs = new FinalScoreScene();
     auto ss = new StartScene();
     auto ps = new PauseScene();
@@ -27,13 +27,11 @@ void SceneManager::createScenes()
     scenes[2] = ss;
     scenes[3] = ps;
 
-    Serial.print("Scene loaded:");
+    Serial.println("Scene loaded:");
     for (Scene *scene : scenes)
     {
-        Serial.print(" ");
-        Serial.print(scene->getSceneType());
+        Serial.printf("%i -- %p\n", scene->getSceneType(), scene);
     }
-    Serial.print("\n");
 }
 
 void SceneManager::changeScene(SceneType sceneType)
@@ -42,14 +40,33 @@ void SceneManager::changeScene(SceneType sceneType)
     {
         if (scene->getSceneType() == sceneType)
         {
-            Serial.print("Change Scene: ");
-            Serial.println(scene->getSceneType());
+            Serial.printf("Change scene: %i -- %p\n", scene->getSceneType(), scene);
             renderEngine->changeScene(scene);
             gameLoop->changeScene(scene);
 
-            //Serial.printf("Try to suspend %s, from status %i\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.inputTaskHandler), eTaskGetState(GameTaskManager::getInstance()->tasks.inputTaskHandler));
+            // Serial.printf("Try to suspend %s, from status %i\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.inputTaskHandler), eTaskGetState(GameTaskManager::getInstance()->tasks.inputTaskHandler));
 
             return;
         }
+    }
+}
+
+void SceneManager::changeScene()
+{
+    switch (getCurrentScene())
+    {
+    case START:
+    case PAUSE:
+        changeScene(GAME);
+        break;
+    case GAME:
+        changeScene(PAUSE);
+        break;
+    case SCORE:
+        gameEntities->resetGame();
+        changeScene(START);
+        break;
+    default:
+        break;
     }
 }

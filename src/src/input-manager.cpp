@@ -30,32 +30,19 @@ void InputManager::startReading(GameEntity *gameEntities)
         if (btn == LOW && btn_prev == HIGH)
         {
             Serial.println("button pressed");
-
-            switch (sceneManager->getCurrentScene())
-            {
-            case START:
-            case PAUSE:
-                sceneManager->changeScene(GAME);
-                break;
-            case GAME:
-                sceneManager->changeScene(PAUSE);
-                break;
-            case SCORE:
-                sceneManager->changeScene(START);
-                break;
-            default:
-                break;
-            }
+            sceneManager->changeScene();
         }
 
         vertical = analogRead(VERT);
         velocityY = 0;
         if (vertical > 3500)
         {
+            Serial.println("Up");
             velocityY = -2;
         }
         else if (vertical < 1000)
         {
+            Serial.println("down");
             velocityY = 2;
         }
 

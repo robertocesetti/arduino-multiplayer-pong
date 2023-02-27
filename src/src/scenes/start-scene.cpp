@@ -108,7 +108,8 @@ void StartScene::render()
     display->setTextColor(SSD1306_WHITE);
     display->setCursor(65, 28);
     display->println(F("START!"));
-    
+
+
     Scene::render();
     /*
     char strBuf[17]; // used for string formatting

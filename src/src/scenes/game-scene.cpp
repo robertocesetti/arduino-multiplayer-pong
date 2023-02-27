@@ -1,10 +1,12 @@
 #include "game-scene.h"
 #include <Arduino.h>
+#include <Fonts/Org_01.h>
+#include "../gameEntities/collision.h"
 
 // https://xbm.jazzychad.net/
 
 /* 1 x 64 */
-static const unsigned char PROGMEM DOTTED_LINE[]  = {
+static const unsigned char PROGMEM DOTTED_LINE[] = {
     0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0xff, 0xff,
     0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe,
     0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0xff, 0xff,
@@ -12,7 +14,9 @@ static const unsigned char PROGMEM DOTTED_LINE[]  = {
     0xfe, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xfe, 0xfe, 0xfe, 0xfe, 0xff, 0xff,
     0xff, 0xff, 0xfe, 0xfe};
 
-GameScene::GameScene(GameEntity *ge) : gameEntities(ge)
+const int SPACE = 15;
+
+GameScene::GameScene(SceneManager* sm, GameEntity *ge) : sceneManager(sm), gameEntities(ge)
 {
     type = GAME;
 }
@@ -37,9 +41,31 @@ void GameScene::tick()
     paddle1->collideWithBoard(displayProperties);
     paddle2->collideWithBoard(displayProperties);
 
-    ball->collideWithBoard(displayProperties);
     ball->collideWithPaddle(paddle1);
     ball->collideWithPaddle(paddle2);
+
+    Collision collision = ball->collideWithBoard(displayProperties);
+    switch (collision)
+    {
+    case LEFT:
+        addPoint(paddle2);
+        break;
+    case RIGTH:
+        addPoint(paddle1);
+        break;
+    default:
+        break;
+    }
+}
+
+void GameScene::addPoint(Paddle *paddle)
+{
+    paddle->addPoint();
+    gameEntities->resetBall();
+    if (paddle->getScore() >= MAX_SCORE)
+    {
+        sceneManager->changeScene(SCORE);
+    }
 }
 
 /*
@@ -74,7 +100,9 @@ void GameScene::moveUsingAI(Paddle *paddle, bool godMode)
 */
 void GameScene::render()
 {
+    //Serial.println("GameRender");
     drawBorder();
+    drawScore();
 
     display->drawXBitmap(64, 0, DOTTED_LINE, 1, 64, SSD1306_WHITE);
 
@@ -87,7 +115,24 @@ void GameScene::render()
 
 void GameScene::drawBorder()
 {
-    display->drawRect(displayProperties->topLeftX, displayProperties->topLeftY, displayProperties->bottomRightX, displayProperties->bottomRightY, WHITE);
+    // top line
+    display->drawFastHLine(displayProperties->topLeftX, displayProperties->topLeftY, displayProperties->width, SSD1306_WHITE);
+    // bottom line
+    display->drawFastHLine(displayProperties->bottomLeftX, displayProperties->bottomLeftY, displayProperties->width, SSD1306_WHITE);
+}
+
+void GameScene::drawScore()
+{
+    display->setTextSize(1);
+    display->setFont(&Org_01);
+    display->setTextColor(SSD1306_WHITE);
+    display->setCursor(displayProperties->topLeftX + 2, 6);
+    display->print(gameEntities->getPaddle1()->getScore());
+
+    display->setFont(&Org_01);
+    display->setTextColor(SSD1306_WHITE);
+    display->setCursor(displayProperties->topRightX - 6, 6);
+    display->print(gameEntities->getPaddle2()->getScore());
 }
 
 void GameScene::drawBall()

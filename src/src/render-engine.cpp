@@ -79,6 +79,9 @@ void RenderEngine::render()
 
 void RenderEngine::changeScene(Scene *scene)
 {
+    Serial.printf("Change scene RenderEngine: %i -- %p\n", scene->getSceneType(), scene);
+
+
     scene->initialize(&display, displayProperties);
     currentScene = scene;
 

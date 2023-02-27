@@ -22,6 +22,7 @@ public:
     ~SceneManager();
 
     void changeScene(SceneType sceneType);
+    void changeScene();
     
     SceneType getCurrentScene(){
         return renderEngine->getCurrentScene()->getSceneType();

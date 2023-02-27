@@ -20,7 +20,7 @@ void GameLoop::update(GameEntity *gameEntities)
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
     Paddle *paddle2 = gameEntities->getPaddle2();
-    ball->updateVelocity(1, 1);
+
     paddle1->updateVelocity(0, 2);
     // paddle2->updateVelocity(0, -0.2f);
 
@@ -55,7 +55,7 @@ void GameLoop::update(GameEntity *gameEntities)
         if (current - lastCheck >= 1000)
         {
             lastCheck = current;
-            Serial.printf("UPS: %i\n", ups);
+            Serial.printf("UPS: %i, %p\n", ups, currentScene);
             ups = 0;
         }
 
@@ -73,6 +73,10 @@ void GameLoop::changeScene(Scene *scene)
     Serial.println(eTaskGetState(GameTaskManager::getInstance()->getGameLoopTaskHandler()));
     */
 
+    Serial.printf("Change scene GameLoop: %i -- %p\n", scene->getSceneType(), scene);
+
+    currentScene = scene;
+
     if (scene->useTick())
     {
         Serial.printf("Try to resume %s, from status %s\n", pcTaskGetName(GameTaskManager::getInstance()->tasks.gameLoopTaskHandler), STATE_NAMES[eTaskGetState(GameTaskManager::getInstance()->tasks.gameLoopTaskHandler)]);
@@ -86,6 +90,4 @@ void GameLoop::changeScene(Scene *scene)
     }
     // Serial.println("AFTER");
     // Serial.println(eTaskGetState(GameTaskManager::getInstance()->getGameLoopTaskHandler()));
-
-    currentScene = scene;
 }
