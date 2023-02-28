@@ -6,9 +6,6 @@ NetworkManager *NetworkManager::instance = nullptr;
 
 NetworkManager::NetworkManager() : initialized(false)
 {
-    // Set your new MAC Address
-    // uint8_t CustomMACaddress[] = {0x78, 0x21, 0x84, 0xE3, 0x80, 0x97};
-
     WiFi.mode(WIFI_STA); // ESP32 in Station Mode
     uint64_t mac = ESP.getEfuseMac();
     uint8_t macArray[6];
@@ -17,38 +14,70 @@ NetworkManager::NetworkManager() : initialized(false)
         macArray[i] = (mac >> ((5 - i) * 8)) & 0xFF;
     }
 
-    if (macArray == U_MAC_1)
+    if (memcmp(macArray, U_MAC_1, 6) == 0)
     {
         Serial.println("\nI'm Master\n");
-        //esp_wifi_set_mac(WIFI_IF_STA, L_MAC_1);
-        master= true;
+        // esp_wifi_set_mac(WIFI_IF_STA, L_MAC_1);
+        master = true;
     }
-    else if (macArray == U_MAC_2)
+    else if (memcmp(macArray, U_MAC_2, 6) == 0)
     {
         Serial.println("\nI'm Slave\n");
-        //esp_wifi_set_mac(WIFI_IF_STA, L_MAC_2);
-        master= false;
+        // esp_wifi_set_mac(WIFI_IF_STA, L_MAC_2);
+        master = false;
     }
-    
-    // esp_wifi_set_mac(WIFI_IF_STA, macArray);
-    //myMAC = WiFi.macAddress();
+
+    Serial.print("MAC Address: ");
     Serial.println(WiFi.macAddress());
 
-    /*
-    Serial.print("Default ESP32 Board MAC Address:  ");
-    //Prints default MAC address
-    Serial.println(WiFi.macAddress());
-    esp_wifi_set_mac(WIFI_IF_STA, &CustomMACaddress[0]);
-    Serial.print("Custom MAC Address for ESP32:  ");
-    //Prints Custom MAC address
-    Serial.println(WiFi.macAddress());
-    */
+    if (master)
+    {
+        uint8_t broadcastAddressTmp[6] = {L_MAC_2[0], L_MAC_2[1], L_MAC_2[2], L_MAC_2[3], L_MAC_2[4], L_MAC_2[5]};
+        // broadcastAddress = {0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84};
+        memcpy(broadcastAddress, broadcastAddressTmp, 6);
+    }
+    else
+    {
+        uint8_t broadcastAddressTmp[6] = {L_MAC_1[0], L_MAC_1[1], L_MAC_1[2], L_MAC_1[3], L_MAC_1[4], L_MAC_1[5]};
+        // broadcastAddress = {0x78, 0x21, 0x84, 0xDE, 0x08, 0x58};
+        memcpy(broadcastAddress, broadcastAddressTmp, 6);
+    }
 
-    //master = strcmp(stringify(MAC_1), myMAC.c_str()) == 0;
+    WiFi.disconnect();
 }
 
 NetworkManager::~NetworkManager()
 {
+}
+
+void NetworkManager::broadcast(const String &message)
+// Emulates a broadcast
+{
+    esp_now_peer_info_t peerInfo = {};
+    uint8_t broadcastAddressTmp[6];// ={0x78, 0x21, 0x84, 0xDE, 0x08, 0x58};
+    
+    if (master)
+    {
+        auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDE, 0x08, 0x58});
+        std::copy(init.begin(), init.end(), broadcastAddressTmp);
+    }
+    else
+    {
+        auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84});
+        std::copy(init.begin(), init.end(), broadcastAddressTmp);
+    }
+    memcpy(&peerInfo.peer_addr, broadcastAddressTmp, 6);
+
+    // Serial.println(broadcastAddress);
+    if (!esp_now_is_peer_exist(broadcastAddressTmp))
+    {
+        esp_now_add_peer(&peerInfo);
+    }
+    // Send message
+    esp_err_t result = esp_now_send(broadcastAddressTmp, (const uint8_t *)message.c_str(), message.length());
+
+    // Print results to serial monitor
+    checkRes(result);
 }
 
 void NetworkManager::startCommunication()
@@ -61,21 +90,11 @@ void NetworkManager::startCommunication()
             vTaskSuspend(NULL);
             continue;
         }
-        // Set values to send
-        BME280Readings.temp = 1;
-        BME280Readings.hum = 1;
-        BME280Readings.pres = 1;
-        // Send message via ESP-NOW
-        esp_err_t result = esp_now_send(getOtherMAC(), (uint8_t *)&BME280Readings, sizeof(BME280Readings));
 
-        if (result == ESP_OK)
-        {
-            Serial.println("Sent with success");
-        }
-        else
-        {
-            Serial.println("Error sending the data");
-        }
+        // Send message
+        // esp_err_t result = esp_now_send(getOtherMAC(), (const uint8_t *)message.c_str(), message.length());
+        broadcast("ciao");
+
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -105,6 +124,8 @@ void NetworkManager::initialize()
     if (esp_now_init() != ESP_OK)
     {
         Serial.println("Error initializing ESP-NOW");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        ESP.restart();
         return;
     }
     Serial.println("ESP NOW INIT");
@@ -118,8 +139,8 @@ void NetworkManager::initialize()
     // uint8_t mac[] = {0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84};
     // esp_now_peer_info_t pInfo;
 
-    if (!instance->addPeer())
-        return;
+    //if (!instance->addPeer())
+    //  return;
 
     //  Register for a callback function that will be called when data is received
     esp_now_register_recv_cb(onDataRecv);
@@ -131,6 +152,7 @@ void NetworkManager::initialize()
 
 bool NetworkManager::addPeer()
 {
+    peerInfo = {};
     // Register peer
     memcpy(peerInfo.peer_addr, getOtherMAC(), 6);
     /*
@@ -152,6 +174,47 @@ bool NetworkManager::addPeer()
     }
     Serial.println();
     esp_err_t addStatus = esp_now_add_peer(&peerInfo);
+    return checkRes(addStatus);
+}
+
+void formatMacAddress(const uint8_t *macAddr, char *buffer, int maxLength)
+// Formats MAC Address
+{
+    snprintf(buffer, maxLength, "%02x:%02x:%02x:%02x:%02x:%02x", macAddr[0], macAddr[1], macAddr[2], macAddr[3], macAddr[4], macAddr[5]);
+}
+
+// Callback when data is sent
+void NetworkManager::onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
+{
+    char macStr[18];
+    formatMacAddress(mac_addr, macStr, 18);
+    Serial.print("Last Packet Sent to: ");
+    Serial.println(macStr);
+    Serial.print("Last Packet Send Status: ");
+    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
+
+// Callback when data is received
+void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len)
+{
+    // Only allow a maximum of 250 characters in the message + a null terminating byte
+    char buffer[ESP_NOW_MAX_DATA_LEN + 1];
+    int msgLen = min(ESP_NOW_MAX_DATA_LEN, data_len);
+    strncpy(buffer, (const char *)data, msgLen);
+
+    // Make sure we are null terminated
+    buffer[msgLen] = 0;
+
+    // Format the MAC address
+    char macStr[18];
+    formatMacAddress(mac_addr, macStr, 18);
+
+    // Send Debug log message to the serial port
+    Serial.printf("Received message from: %s - %s\n", macStr, buffer);
+}
+
+bool NetworkManager::checkRes(esp_err_t addStatus)
+{
     if (addStatus == ESP_OK)
     {
         // Pair success
@@ -159,7 +222,6 @@ bool NetworkManager::addPeer()
     }
     else if (addStatus == ESP_ERR_ESPNOW_NOT_INIT)
     {
-        // How did we get so far!!
         Serial.println("ESPNOW Not Init");
         return false;
     }
@@ -190,30 +252,4 @@ bool NetworkManager::addPeer()
     }
 
     return true;
-}
-
-// Callback when data is sent
-void NetworkManager::onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
-{
-    Serial.print("\r\nLast Packet Send Status:\t");
-    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-    if (status == 0)
-    {
-        // success = "Delivery Success :)";
-    }
-    else
-    {
-        // success = "Delivery Fail :(";
-    }
-}
-
-// Callback when data is received
-void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len)
-{
-    // memcpy(&incomingReadings, incomingData, sizeof(incomingReadings));
-    Serial.print("Bytes received: ");
-    Serial.println(data_len);
-    // incomingTemp = incomingReadings.temp;
-    // incomingHum = incomingReadings.hum;
-    // incomingPres = incomingReadings.pres;
 }

@@ -33,8 +33,12 @@ private:
     esp_now_peer_info_t peerInfo;
     bool master;
     bool initialized;
+    uint8_t broadcastAddress[6];
     struct_message BME280Readings;
     bool addPeer();
+    bool checkRes(esp_err_t addStatus);
+
+    void broadcast(const String &message);
 
     NetworkManager();
 
@@ -44,6 +48,7 @@ public:
     bool isMaster() { return master; }
     bool isSlave() { return !master; }
     const uint8_t *getOtherMAC() { return master ? L_MAC_2 : L_MAC_1; };
+
 
     void startCommunication();
 
