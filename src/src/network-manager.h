@@ -15,7 +15,7 @@ typedef struct struct_message
 // dam: 84 f2 dd 84 21 78
 // mat: 58 08 de 84 21 78
 // Master
-//const uint8_t MAC_1[] = {0x78, 0x21, 0x84, 0xE3, 0x80, 0x97};
+//const uint8_t MAC_1[] = {0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84};
 
 // Master
 const uint8_t MAC_1[] = {0x84, 0xF2, 0xDD, 0x84, 0x21, 0x78};
@@ -34,6 +34,7 @@ private:
     bool master;
     bool initialized;
     struct_message BME280Readings;
+    bool addPeer();
 
     NetworkManager();
 

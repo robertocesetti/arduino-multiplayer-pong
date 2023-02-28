@@ -4,7 +4,7 @@
 
 NetworkManager *NetworkManager::instance = nullptr;
 
-NetworkManager::NetworkManager()
+NetworkManager::NetworkManager() : initialized(false)
 {
     // Set your new MAC Address
     // uint8_t CustomMACaddress[] = {0x78, 0x21, 0x84, 0xE3, 0x80, 0x97};
@@ -75,12 +75,17 @@ NetworkManager *NetworkManager::getInstance()
     return instance;
 }
 
-void NetworkManager::initialize(void)
+void NetworkManager::initialize()
 {
     instance = getInstance();
 
     if (instance->initialized)
         return;
+
+    // Deinit ESP-NOW to ensure a clean start
+    esp_now_deinit();
+
+    Serial.println("ESP initialize");
 
     // Init ESP-NOW
     if (esp_now_init() != ESP_OK)
@@ -88,27 +93,88 @@ void NetworkManager::initialize(void)
         Serial.println("Error initializing ESP-NOW");
         return;
     }
+    Serial.println("ESP NOW INIT");
 
     // Once ESPNow is successfully Init, we will register for Send CB to
     // get the status of Trasnmitted paket
     esp_now_register_send_cb(onDataSent);
 
-    // Register peer
-    memcpy(instance->peerInfo.peer_addr, instance->getOtherMAC(), 6);
-    instance->peerInfo.channel = 0;
-    instance->peerInfo.encrypt = false;
+    Serial.println("after esp_now_register_send_cb");
 
-    // Add peer
-    if (esp_now_add_peer(&(instance->peerInfo)) != ESP_OK)
-    {
-        Serial.println("Failed to add peer");
-        return;
-    }
+    // uint8_t mac[] = {0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84};
+    // esp_now_peer_info_t pInfo;
+
+    if(!instance->addPeer()) return;
 
     //  Register for a callback function that will be called when data is received
     esp_now_register_recv_cb(onDataRecv);
 
+    Serial.println("after esp_now_register_recv_cb");
+
     instance->initialized = true;
+}
+
+bool NetworkManager::addPeer()
+{
+    // Register peer
+    memcpy(peerInfo.peer_addr, getOtherMAC(), 6);
+    /*
+    for (int ii = 0; ii < 6; ++ii)
+    {
+        pInfo.peer_addr[ii] = (uint8_t)mac[ii];
+    }*/
+    peerInfo.ifidx = WIFI_IF_AP;
+    peerInfo.channel = 0;
+    peerInfo.encrypt = false;
+
+    // print the MAC address in hexadecimal notation
+    Serial.print("MAC address: ");
+    for (int i = 0; i < 6; i++)
+    {
+        Serial.print(peerInfo.peer_addr[i], HEX);
+        if (i < 5)
+            Serial.print(":");
+    }
+    Serial.println();
+    esp_err_t addStatus = esp_now_add_peer(&peerInfo);
+    if (addStatus == ESP_OK)
+    {
+        // Pair success
+        Serial.println("Pair success");
+    }
+    else if (addStatus == ESP_ERR_ESPNOW_NOT_INIT)
+    {
+        // How did we get so far!!
+        Serial.println("ESPNOW Not Init");
+        return false;
+    }
+    else if (addStatus == ESP_ERR_ESPNOW_ARG)
+    {
+        Serial.println("Invalid Argument");
+        return false;
+    }
+    else if (addStatus == ESP_ERR_ESPNOW_FULL)
+    {
+        Serial.println("Peer list full");
+        return false;
+    }
+    else if (addStatus == ESP_ERR_ESPNOW_NO_MEM)
+    {
+        Serial.println("Out of memory");
+        return false;
+    }
+    else if (addStatus == ESP_ERR_ESPNOW_EXIST)
+    {
+        Serial.println("Peer Exists");
+        return false;
+    }
+    else
+    {
+        Serial.println("Not sure what happened");
+        return false;
+    }
+
+    return true;
 }
 
 // Callback when data is sent
