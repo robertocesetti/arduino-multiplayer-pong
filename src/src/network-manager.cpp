@@ -17,8 +17,21 @@ NetworkManager::NetworkManager() : initialized(false)
         macArray[i] = (mac >> ((5 - i) * 8)) & 0xFF;
     }
 
-    esp_wifi_set_mac(WIFI_IF_STA, macArray);
-    myMAC = WiFi.macAddress();
+    if (macArray == U_MAC_1)
+    {
+        Serial.println("\nI'm Master\n");
+        //esp_wifi_set_mac(WIFI_IF_STA, L_MAC_1);
+        master= true;
+    }
+    else if (macArray == U_MAC_2)
+    {
+        Serial.println("\nI'm Slave\n");
+        //esp_wifi_set_mac(WIFI_IF_STA, L_MAC_2);
+        master= false;
+    }
+    
+    // esp_wifi_set_mac(WIFI_IF_STA, macArray);
+    //myMAC = WiFi.macAddress();
     Serial.println(WiFi.macAddress());
 
     /*
@@ -29,8 +42,9 @@ NetworkManager::NetworkManager() : initialized(false)
     Serial.print("Custom MAC Address for ESP32:  ");
     //Prints Custom MAC address
     Serial.println(WiFi.macAddress());
-    master = strcmp(stringify(MAC_1), myMAC.c_str()) == 0;
     */
+
+    //master = strcmp(stringify(MAC_1), myMAC.c_str()) == 0;
 }
 
 NetworkManager::~NetworkManager()
@@ -104,7 +118,8 @@ void NetworkManager::initialize()
     // uint8_t mac[] = {0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84};
     // esp_now_peer_info_t pInfo;
 
-    if(!instance->addPeer()) return;
+    if (!instance->addPeer())
+        return;
 
     //  Register for a callback function that will be called when data is received
     esp_now_register_recv_cb(onDataRecv);
