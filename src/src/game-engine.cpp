@@ -27,7 +27,7 @@ void xTaskInputManager(void *params)
 void xTaskNetwork(void *params)
 {
     Serial.println(F("Starting task 'xTaskNetwork'"));
-    // GameEngine *engine = static_cast<GameEngine *>(params);
+    GameEngine *engine = static_cast<GameEngine *>(params);
     // engine->getNetworkManager()->receiveData();
     NetworkManager::getInstance()->startCommunication();
 }
@@ -69,7 +69,7 @@ void GameEngine::start()
 
     running = true;
 
-    NetworkManager::initialize();
+    NetworkManager::initialize(&gameEntity);
     createTasks();
 
     gameEntity.resetGame();

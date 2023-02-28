@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <Fonts/Org_01.h>
 #include "../gameEntities/collision.h"
+#include "../network-manager.h"
 
 // https://xbm.jazzychad.net/
 
@@ -27,6 +28,8 @@ GameScene::~GameScene()
 
 void GameScene::tick()
 {
+    if(NetworkManager::getInstance()->isSlave()) return;
+
     //Serial.println("<--GameTick-->");
     Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();

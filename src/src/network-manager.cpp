@@ -54,8 +54,8 @@ void NetworkManager::broadcast(const String &message)
 // Emulates a broadcast
 {
     esp_now_peer_info_t peerInfo = {};
-    uint8_t broadcastAddressTmp[6];// ={0x78, 0x21, 0x84, 0xDE, 0x08, 0x58};
-    
+    uint8_t broadcastAddressTmp[6]; // ={0x78, 0x21, 0x84, 0xDE, 0x08, 0x58};
+
     if (master)
     {
         auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDE, 0x08, 0x58});
@@ -66,8 +66,8 @@ void NetworkManager::broadcast(const String &message)
         auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84});
         std::copy(init.begin(), init.end(), broadcastAddressTmp);
     }
-    memcpy(&peerInfo.peer_addr, broadcastAddressTmp, 6);
 
+    memcpy(&peerInfo.peer_addr, broadcastAddressTmp, 6);
     // Serial.println(broadcastAddress);
     if (!esp_now_is_peer_exist(broadcastAddressTmp))
     {
@@ -82,6 +82,8 @@ void NetworkManager::broadcast(const String &message)
 
 void NetworkManager::startCommunication()
 {
+    Ball *ball = gameEntity->getBall();
+    String position = "";
     while (true)
     {
         if (!initialized)
@@ -91,11 +93,14 @@ void NetworkManager::startCommunication()
             continue;
         }
 
-        // Send message
-        // esp_err_t result = esp_now_send(getOtherMAC(), (const uint8_t *)message.c_str(), message.length());
-        broadcast("ciao");
+        if(master)
+        {
+            position = String(ball->getPositionX()) + ";" + String(ball->getPositionY());
+            //Serial.println(position);
+            broadcast(position);
+        }
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
 
@@ -108,7 +113,7 @@ NetworkManager *NetworkManager::getInstance()
     return instance;
 }
 
-void NetworkManager::initialize()
+void NetworkManager::initialize(GameEntity *gameEntity)
 {
     instance = getInstance();
 
@@ -139,42 +144,16 @@ void NetworkManager::initialize()
     // uint8_t mac[] = {0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84};
     // esp_now_peer_info_t pInfo;
 
-    //if (!instance->addPeer())
-    //  return;
+    // if (!instance->addPeer())
+    //   return;
 
     //  Register for a callback function that will be called when data is received
     esp_now_register_recv_cb(onDataRecv);
 
     Serial.println("after esp_now_register_recv_cb");
+    instance->gameEntity = gameEntity;
 
     instance->initialized = true;
-}
-
-bool NetworkManager::addPeer()
-{
-    peerInfo = {};
-    // Register peer
-    memcpy(peerInfo.peer_addr, getOtherMAC(), 6);
-    /*
-    for (int ii = 0; ii < 6; ++ii)
-    {
-        pInfo.peer_addr[ii] = (uint8_t)mac[ii];
-    }*/
-    peerInfo.ifidx = WIFI_IF_AP;
-    peerInfo.channel = 0;
-    peerInfo.encrypt = false;
-
-    // print the MAC address in hexadecimal notation
-    Serial.print("MAC address: ");
-    for (int i = 0; i < 6; i++)
-    {
-        Serial.print(peerInfo.peer_addr[i], HEX);
-        if (i < 5)
-            Serial.print(":");
-    }
-    Serial.println();
-    esp_err_t addStatus = esp_now_add_peer(&peerInfo);
-    return checkRes(addStatus);
 }
 
 void formatMacAddress(const uint8_t *macAddr, char *buffer, int maxLength)
@@ -188,10 +167,10 @@ void NetworkManager::onDataSent(const uint8_t *mac_addr, esp_now_send_status_t s
 {
     char macStr[18];
     formatMacAddress(mac_addr, macStr, 18);
-    Serial.print("Last Packet Sent to: ");
+    /*Serial.print("Last Packet Sent to: ");
     Serial.println(macStr);
     Serial.print("Last Packet Send Status: ");
-    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");*/
 }
 
 // Callback when data is received
@@ -210,7 +189,42 @@ void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, in
     formatMacAddress(mac_addr, macStr, 18);
 
     // Send Debug log message to the serial port
-    Serial.printf("Received message from: %s - %s\n", macStr, buffer);
+    //Serial.printf("Received message from: %s - %s\n", macStr, buffer);
+
+    char *ptr;
+    unsigned int x, y;
+
+    // Divido la stringa in due sottostringhe separate dal carattere ';'
+    ptr = strtok(buffer, ";");
+    if (ptr != NULL)
+    {
+        // Converto la prima sottostringa in un unsigned int
+        x = strtoul(ptr, NULL, 10);
+    }
+    else
+    {
+        Serial.println("Unable to read X");
+        // Errore: la stringa non contiene due sottostringhe separate dal carattere ';'
+        return;
+    }
+
+    ptr = strtok(NULL, ";");
+    if (ptr != NULL)
+    {
+        // Converto la seconda sottostringa in un unsigned int
+        y = strtoul(ptr, NULL, 10);
+    }
+    else
+    {
+        Serial.println("Unable to read Y");
+        // Errore: la stringa non contiene due sottostringhe separate dal carattere ';'
+        return;
+    }
+
+    // Stampo i valori di x e y
+    //Serial.printf("X: %i, Y: %i\n", x, y);
+
+    instance->gameEntity->getBall()->setPosition(x, y);
 }
 
 bool NetworkManager::checkRes(esp_err_t addStatus)

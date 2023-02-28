@@ -2,6 +2,7 @@
 
 #include <esp_now.h>
 #include <Arduino.h>
+#include "gameEntities/game-entity.h"
 
 #define stringify(x) #x
 
@@ -35,6 +36,8 @@ private:
     bool initialized;
     uint8_t broadcastAddress[6];
     struct_message BME280Readings;
+    GameEntity *gameEntity;
+
     bool addPeer();
     bool checkRes(esp_err_t addStatus);
 
@@ -49,11 +52,10 @@ public:
     bool isSlave() { return !master; }
     const uint8_t *getOtherMAC() { return master ? L_MAC_2 : L_MAC_1; };
 
-
     void startCommunication();
 
     static NetworkManager* getInstance();
-    static void initialize();
+    static void initialize(GameEntity *gameEntity);
     static void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status);
     static void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len);
 };

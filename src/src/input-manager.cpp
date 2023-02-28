@@ -37,12 +37,10 @@ void InputManager::startReading(GameEntity *gameEntities)
         velocityY = 0;
         if (vertical > 3500)
         {
-            Serial.println("Up");
             velocityY = -2;
         }
         else if (vertical < 1000)
         {
-            Serial.println("down");
             velocityY = 2;
         }
 
