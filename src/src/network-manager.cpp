@@ -1,17 +1,36 @@
 #include "network-manager.h"
 #include "WiFi.h"
+#include <esp_wifi.h>
 
 NetworkManager *NetworkManager::instance = nullptr;
 
 NetworkManager::NetworkManager()
 {
-    WiFi.mode(WIFI_MODE_STA);
-    myMAC = WiFi.macAddress();
-    master = strcmp(stringify(MAC_1), myMAC.c_str()) == 0;
+    // Set your new MAC Address
+    // uint8_t CustomMACaddress[] = {0x78, 0x21, 0x84, 0xE3, 0x80, 0x97};
 
-    char macStr[18];
-    sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", myMAC[0], myMAC[1], myMAC[2], myMAC[3], myMAC[4], myMAC[5]);
-    Serial.printf("My MAC address: %s, Am I the master? %s\n", macStr, (master ? "yes" : "no"));
+    WiFi.mode(WIFI_STA); // ESP32 in Station Mode
+    uint64_t mac = ESP.getEfuseMac();
+    uint8_t macArray[6];
+    for (int i = 0; i < 6; i++)
+    {
+        macArray[i] = (mac >> ((5 - i) * 8)) & 0xFF;
+    }
+
+    esp_wifi_set_mac(WIFI_IF_STA, macArray);
+    myMAC = WiFi.macAddress();
+    Serial.println(WiFi.macAddress());
+
+    /*
+    Serial.print("Default ESP32 Board MAC Address:  ");
+    //Prints default MAC address
+    Serial.println(WiFi.macAddress());
+    esp_wifi_set_mac(WIFI_IF_STA, &CustomMACaddress[0]);
+    Serial.print("Custom MAC Address for ESP32:  ");
+    //Prints Custom MAC address
+    Serial.println(WiFi.macAddress());
+    master = strcmp(stringify(MAC_1), myMAC.c_str()) == 0;
+    */
 }
 
 NetworkManager::~NetworkManager()
@@ -22,6 +41,27 @@ void NetworkManager::startCommunication()
 {
     while (true)
     {
+        if (!initialized)
+        {
+            Serial.println("Inizialization failed!");
+            vTaskSuspend(NULL);
+            continue;
+        }
+        // Set values to send
+        BME280Readings.temp = 1;
+        BME280Readings.hum = 1;
+        BME280Readings.pres = 1;
+        // Send message via ESP-NOW
+        esp_err_t result = esp_now_send(getOtherMAC(), (uint8_t *)&BME280Readings, sizeof(BME280Readings));
+
+        if (result == ESP_OK)
+        {
+            Serial.println("Sent with success");
+        }
+        else
+        {
+            Serial.println("Error sending the data");
+        }
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }

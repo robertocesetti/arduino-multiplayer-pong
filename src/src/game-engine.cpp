@@ -27,8 +27,8 @@ void xTaskInputManager(void *params)
 void xTaskNetwork(void *params)
 {
     Serial.println(F("Starting task 'xTaskNetwork'"));
-    //GameEngine *engine = static_cast<GameEngine *>(params);
-    //engine->getNetworkManager()->receiveData();
+    // GameEngine *engine = static_cast<GameEngine *>(params);
+    // engine->getNetworkManager()->receiveData();
     NetworkManager::getInstance()->startCommunication();
 }
 
@@ -43,6 +43,8 @@ void xTaskStatus(void *params)
         Serial.printf("Memory heap: %i (used) / %i (total)\n", ESP.getFreeHeap(), ESP.getHeapSize());
         Serial.printf("Sketch space: %i (used) / %i (available)\n", ESP.getSketchSize(), ESP.getFreeSketchSpace());
         Serial.print(F("------------------------\n\n\n"));
+        Serial.printf("\nCHIP MAC: %012llx\n", ESP.getEfuseMac());
+        Serial.printf("\nCHIP MODEL: %012llx\n", ESP.getChipModel());
         vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
