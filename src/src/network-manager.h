@@ -3,15 +3,7 @@
 #include <esp_now.h>
 #include <Arduino.h>
 #include "gameEntities/game-entity.h"
-
-#define stringify(x) #x
-
-typedef struct struct_message
-{
-    float temp;
-    float hum;
-    float pres;
-} struct_message;
+#include "messages/message.h"
 
 // dam: 84 f2 dd 84 21 78 - 0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84
 // mat: 58 08 de 84 21 78 - 0x78, 0x21, 0x84, 0xDE, 0x08, 0x58
@@ -35,13 +27,13 @@ private:
     bool master;
     bool initialized;
     uint8_t broadcastAddress[6];
-    struct_message BME280Readings;
     GameEntity *gameEntity;
 
     bool addPeer();
-    bool checkRes(esp_err_t addStatus);
+    bool checkResult(esp_err_t addStatus, String success_message);
 
-    void broadcast(const String &message);
+    template<typename T>
+    void sendMessage(const T &message);
 
     NetworkManager();
 

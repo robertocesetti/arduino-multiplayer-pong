@@ -26,4 +26,3 @@ Collision Paddle::collideWithBoard(DisplayProperties *displayProperties)
 
     return NONE;
 }
-

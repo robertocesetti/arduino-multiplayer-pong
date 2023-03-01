@@ -1,14 +1,18 @@
 #include "network-manager.h"
 #include "WiFi.h"
+#include "messages/position-message.h"
+#include "messages/point-message.h"
 #include <esp_wifi.h>
 
 NetworkManager *NetworkManager::instance = nullptr;
 
 NetworkManager::NetworkManager() : initialized(false)
 {
-    WiFi.mode(WIFI_STA); // ESP32 in Station Mode
+    // ESP32 in Station Mode
+    WiFi.mode(WIFI_STA);
     uint64_t mac = ESP.getEfuseMac();
     uint8_t macArray[6];
+
     for (int i = 0; i < 6; i++)
     {
         macArray[i] = (mac >> ((5 - i) * 8)) & 0xFF;
@@ -16,33 +20,25 @@ NetworkManager::NetworkManager() : initialized(false)
 
     if (memcmp(macArray, U_MAC_1, 6) == 0)
     {
-        Serial.println("\nI'm Master\n");
-        // esp_wifi_set_mac(WIFI_IF_STA, L_MAC_1);
+        Serial.println("\nI'm the Master\n");
         master = true;
+        auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDE, 0x08, 0x58});
+        std::copy(init.begin(), init.end(), broadcastAddress);
     }
     else if (memcmp(macArray, U_MAC_2, 6) == 0)
     {
-        Serial.println("\nI'm Slave\n");
-        // esp_wifi_set_mac(WIFI_IF_STA, L_MAC_2);
+        Serial.println("\nI'm the Slave\n");
         master = false;
+        auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84});
+        std::copy(init.begin(), init.end(), broadcastAddress);
+    }
+    else
+    {
+        Serial.println("\nUnknow MAC address...\n");
     }
 
     Serial.print("MAC Address: ");
     Serial.println(WiFi.macAddress());
-
-    if (master)
-    {
-        uint8_t broadcastAddressTmp[6] = {L_MAC_2[0], L_MAC_2[1], L_MAC_2[2], L_MAC_2[3], L_MAC_2[4], L_MAC_2[5]};
-        // broadcastAddress = {0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84};
-        memcpy(broadcastAddress, broadcastAddressTmp, 6);
-    }
-    else
-    {
-        uint8_t broadcastAddressTmp[6] = {L_MAC_1[0], L_MAC_1[1], L_MAC_1[2], L_MAC_1[3], L_MAC_1[4], L_MAC_1[5]};
-        // broadcastAddress = {0x78, 0x21, 0x84, 0xDE, 0x08, 0x58};
-        memcpy(broadcastAddress, broadcastAddressTmp, 6);
-    }
-
     WiFi.disconnect();
 }
 
@@ -50,40 +46,24 @@ NetworkManager::~NetworkManager()
 {
 }
 
-void NetworkManager::broadcast(const String &message)
-// Emulates a broadcast
+template <typename T>
+void NetworkManager::sendMessage(const T &message)
 {
-    esp_now_peer_info_t peerInfo = {};
-    uint8_t broadcastAddressTmp[6]; // ={0x78, 0x21, 0x84, 0xDE, 0x08, 0x58};
-
-    if (master)
-    {
-        auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDE, 0x08, 0x58});
-        std::copy(init.begin(), init.end(), broadcastAddressTmp);
-    }
-    else
-    {
-        auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84});
-        std::copy(init.begin(), init.end(), broadcastAddressTmp);
-    }
-
-    memcpy(&peerInfo.peer_addr, broadcastAddressTmp, 6);
-    // Serial.println(broadcastAddress);
-    if (!esp_now_is_peer_exist(broadcastAddressTmp))
-    {
-        esp_now_add_peer(&peerInfo);
-    }
     // Send message
-    esp_err_t result = esp_now_send(broadcastAddressTmp, (const uint8_t *)message.c_str(), message.length());
+    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&message, sizeof(T));
 
     // Print results to serial monitor
-    checkRes(result);
+    // checkResult(result, "Message sent!!");
 }
 
 void NetworkManager::startCommunication()
 {
     Ball *ball = gameEntity->getBall();
-    String position = "";
+    Paddle *paddle1 = gameEntity->getPaddle1();
+    Paddle *paddle2 = gameEntity->getPaddle2();
+    PositionMessage positionMessage;
+    PointMessage pointMessage;
+
     while (true)
     {
         if (!initialized)
@@ -93,11 +73,28 @@ void NetworkManager::startCommunication()
             continue;
         }
 
-        if(master)
+        if (master)
         {
-            position = String(ball->getPositionX()) + ";" + String(ball->getPositionY());
-            //Serial.println(position);
-            broadcast(position);
+            positionMessage.enityType = BALL;
+            positionMessage.positionX = ball->getPositionX();
+            positionMessage.positionY = ball->getPositionY();
+            sendMessage(positionMessage);
+
+            positionMessage.enityType = PADDLE;
+            positionMessage.positionX = paddle2->getPositionX();
+            positionMessage.positionY = paddle2->getPositionY();
+            sendMessage(positionMessage);
+
+            pointMessage.paddle1Point = paddle1->getScore();
+            pointMessage.paddle2Point = paddle2->getScore();
+            sendMessage(pointMessage);
+        }
+        else
+        {
+            positionMessage.enityType = PADDLE;
+            positionMessage.positionX = paddle1->getPositionX();
+            positionMessage.positionY = paddle1->getPositionY();
+            sendMessage(positionMessage);
         }
 
         vTaskDelay(pdMS_TO_TICKS(30));
@@ -135,17 +132,13 @@ void NetworkManager::initialize(GameEntity *gameEntity)
     }
     Serial.println("ESP NOW INIT");
 
-    // Once ESPNow is successfully Init, we will register for Send CB to
-    // get the status of Trasnmitted paket
+    // Once ESPNow is successfully Init, we will register for Send CB to get the status of Trasnmitted paket
     esp_now_register_send_cb(onDataSent);
 
     Serial.println("after esp_now_register_send_cb");
 
-    // uint8_t mac[] = {0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84};
-    // esp_now_peer_info_t pInfo;
-
-    // if (!instance->addPeer())
-    //   return;
+    if (!instance->addPeer())
+        return;
 
     //  Register for a callback function that will be called when data is received
     esp_now_register_recv_cb(onDataRecv);
@@ -176,63 +169,61 @@ void NetworkManager::onDataSent(const uint8_t *mac_addr, esp_now_send_status_t s
 // Callback when data is received
 void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len)
 {
-    // Only allow a maximum of 250 characters in the message + a null terminating byte
-    char buffer[ESP_NOW_MAX_DATA_LEN + 1];
-    int msgLen = min(ESP_NOW_MAX_DATA_LEN, data_len);
-    strncpy(buffer, (const char *)data, msgLen);
-
-    // Make sure we are null terminated
-    buffer[msgLen] = 0;
-
-    // Format the MAC address
-    char macStr[18];
-    formatMacAddress(mac_addr, macStr, 18);
-
-    // Send Debug log message to the serial port
-    //Serial.printf("Received message from: %s - %s\n", macStr, buffer);
-
-    char *ptr;
-    unsigned int x, y;
-
-    // Divido la stringa in due sottostringhe separate dal carattere ';'
-    ptr = strtok(buffer, ";");
-    if (ptr != NULL)
+    Message receive_Data;
+    memcpy(&receive_Data, data, sizeof(receive_Data));
+    // Serial.printf("\nReceive Data - bytes received: %i\n", data_len);
+    switch (receive_Data.messageType)
     {
-        // Converto la prima sottostringa in un unsigned int
-        x = strtoul(ptr, NULL, 10);
-    }
-    else
+    case POSITION:
     {
-        Serial.println("Unable to read X");
-        // Errore: la stringa non contiene due sottostringhe separate dal carattere ';'
-        return;
+        PositionMessage pm;
+        memcpy(&pm, data, sizeof(pm));
+        unsigned int x = pm.positionX;
+        unsigned int y = pm.positionY;
+        // Serial.printf("Receive Data - entityType: [POSITION], positionX: %i, positionY: %i\n", x, y);
+        if (pm.enityType == BALL)
+        {
+            instance->gameEntity->getBall()->setPosition(x, y);
+        }
+        else
+        {
+            if (instance->master)
+                instance->gameEntity->getPaddle1()->setPosition(x, y);
+            else
+                instance->gameEntity->getPaddle2()->setPosition(x, y);
+        }
     }
-
-    ptr = strtok(NULL, ";");
-    if (ptr != NULL)
+    break;
+    case POINT:
     {
-        // Converto la seconda sottostringa in un unsigned int
-        y = strtoul(ptr, NULL, 10);
+        PointMessage sm;
+        memcpy(&sm, data, sizeof(sm));
+        instance->gameEntity->getPaddle1()->setPoint(sm.paddle1Point);
+        instance->gameEntity->getPaddle2()->setPoint(sm.paddle2Point);
     }
-    else
-    {
-        Serial.println("Unable to read Y");
-        // Errore: la stringa non contiene due sottostringhe separate dal carattere ';'
-        return;
+    break;
     }
-
-    // Stampo i valori di x e y
-    //Serial.printf("X: %i, Y: %i\n", x, y);
-
-    instance->gameEntity->getBall()->setPosition(x, y);
 }
 
-bool NetworkManager::checkRes(esp_err_t addStatus)
+bool NetworkManager::addPeer()
+{
+    peerInfo = {};
+
+    memcpy(&peerInfo.peer_addr, broadcastAddress, 6);
+    // Serial.println(broadcastAddress);
+    if (!esp_now_is_peer_exist(broadcastAddress))
+    {
+        return checkResult(esp_now_add_peer(&peerInfo), "Pair Success!!");
+    }
+
+    return true;
+}
+
+bool NetworkManager::checkResult(esp_err_t addStatus, String success_message)
 {
     if (addStatus == ESP_OK)
     {
-        // Pair success
-        Serial.println("Pair success");
+        Serial.println(success_message);
     }
     else if (addStatus == ESP_ERR_ESPNOW_NOT_INIT)
     {

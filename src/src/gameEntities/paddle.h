@@ -19,6 +19,7 @@ public:
     unsigned int getWidth() {return WIDTH;}
     unsigned int getHeight() {return HEIGHT;}
     unsigned int getScore() {return score;}
+    void setPoint(short point){score=point;}
     void addPoint(){score+=1;}
     void resetScore(){score = 0;}
 

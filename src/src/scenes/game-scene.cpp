@@ -17,7 +17,7 @@ static const unsigned char PROGMEM DOTTED_LINE[] = {
 
 const int SPACE = 15;
 
-GameScene::GameScene(SceneManager* sm, GameEntity *ge) : sceneManager(sm), gameEntities(ge)
+GameScene::GameScene(SceneManager *sm, GameEntity *ge) : sceneManager(sm), gameEntities(ge)
 {
     type = GAME;
 }
@@ -28,20 +28,24 @@ GameScene::~GameScene()
 
 void GameScene::tick()
 {
-    if(NetworkManager::getInstance()->isSlave()) return;
-
-    //Serial.println("<--GameTick-->");
-    Ball *ball = gameEntities->getBall();
     Paddle *paddle1 = gameEntities->getPaddle1();
+    if (NetworkManager::getInstance()->isSlave())
+    {
+        paddle1->move();
+        paddle1->collideWithBoard(displayProperties);
+
+        return;
+    }
+
+    // Serial.println("<--GameTick-->");
+    Ball *ball = gameEntities->getBall();
     Paddle *paddle2 = gameEntities->getPaddle2();
 
     ball->move();
-    paddle1->move();
     paddle2->move();
     // moveUsingAI(paddle1, true);
     // moveUsingAI(paddle2, true);
 
-    paddle1->collideWithBoard(displayProperties);
     paddle2->collideWithBoard(displayProperties);
 
     ball->collideWithPaddle(paddle1);
@@ -103,7 +107,7 @@ void GameScene::moveUsingAI(Paddle *paddle, bool godMode)
 */
 void GameScene::render()
 {
-    //Serial.println("GameRender");
+    // Serial.println("GameRender");
     drawBorder();
     drawScore();
 
