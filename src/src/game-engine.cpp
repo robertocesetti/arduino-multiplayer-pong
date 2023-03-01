@@ -2,6 +2,7 @@
 #include "gameEntities/game-entity.h"
 #include "game-engine.h"
 #include "game-task-manager.h"
+#include "network-manager.h"
 
 void xTaskRender(void *params)
 {
@@ -69,7 +70,7 @@ void GameEngine::start()
 
     running = true;
 
-    NetworkManager::initialize(&gameEntity);
+    NetworkManager::initialize(&gameEntity, &sceneManager);
     createTasks();
 
     gameEntity.resetGame();
@@ -79,6 +80,8 @@ void GameEngine::start()
 void GameEngine::createTasks()
 {
 
+    GameTaskManager::getInstance()->tasks.networkQueueHandler = xQueueCreate( 5, sizeof(Message*));
+    
     // Create the task for the rendering
     xTaskCreatePinnedToCore(
         xTaskRender, // Pointer to the task function

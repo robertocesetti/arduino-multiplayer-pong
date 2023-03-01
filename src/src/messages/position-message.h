@@ -1,3 +1,5 @@
+#pragma once
+
 #include "message.h"
 
 enum EntityType { BALL, PADDLE };

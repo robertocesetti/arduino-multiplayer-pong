@@ -1,3 +1,5 @@
+#pragma once
+
 #include "message.h"
 
 struct PointMessage : public Message 

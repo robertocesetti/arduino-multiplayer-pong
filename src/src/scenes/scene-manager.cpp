@@ -4,6 +4,7 @@
 #include "game-scene.h"
 #include "final-score-scene.h"
 #include "pause-scene.h"
+#include "../messages/scene-message.h"
 #include "../game-task-manager.h"
 
 SceneManager::SceneManager(GameEntity *ge, RenderEngine *re, GameLoop *gl) : gameEntities(ge), renderEngine(re), gameLoop(gl)
@@ -51,16 +52,25 @@ void SceneManager::changeScene(SceneType sceneType)
     }
 }
 
+SceneMessage sm;
+
 void SceneManager::changeScene()
 {
+    
     switch (getCurrentScene())
     {
     case START:
+        changeScene(GAME);
+        break;
     case PAUSE:
         changeScene(GAME);
+        sm.sceneType = GAME;
+        GameTaskManager::getInstance()->networkQueueSend(&sm);
         break;
     case GAME:
         changeScene(PAUSE);
+        sm.sceneType = PAUSE;
+        GameTaskManager::getInstance()->networkQueueSend(&sm);
         break;
     case SCORE:
         gameEntities->resetGame();

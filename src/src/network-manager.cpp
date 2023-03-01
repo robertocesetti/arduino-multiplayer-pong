@@ -2,6 +2,9 @@
 #include "WiFi.h"
 #include "messages/position-message.h"
 #include "messages/point-message.h"
+#include "messages/scene-message.h"
+#include "game-task-manager.h"
+
 #include <esp_wifi.h>
 
 NetworkManager *NetworkManager::instance = nullptr;
@@ -53,7 +56,7 @@ void NetworkManager::sendMessage(const T &message)
     esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&message, sizeof(T));
 
     // Print results to serial monitor
-    // checkResult(result, "Message sent!!");
+    checkResult(result, "Message sent!!");
 }
 
 void NetworkManager::startCommunication()
@@ -63,6 +66,10 @@ void NetworkManager::startCommunication()
     Paddle *paddle2 = gameEntity->getPaddle2();
     PositionMessage positionMessage;
     PointMessage pointMessage;
+    SceneMessage sm;
+    Message* pxRxedMessage;
+
+    QueueHandle_t xQueue = GameTaskManager::getInstance()->tasks.networkQueueHandler;
 
     while (true)
     {
@@ -97,6 +104,16 @@ void NetworkManager::startCommunication()
             sendMessage(positionMessage);
         }
 
+        if( xQueueReceive( xQueue, &( pxRxedMessage ), 10 ) == pdPASS )
+        {
+            Serial.printf("Received message from queue - messageType %i, queue space %i\n", pxRxedMessage->messageType, uxQueueSpacesAvailable(xQueue));
+            if(pxRxedMessage->messageType == SCENE){
+                sm = *((SceneMessage*) pxRxedMessage);
+                Serial.printf("pxRxedMessage: %p, sm: %p, st: %i\n", pxRxedMessage, &sm, sm.sceneType);
+                sendMessage(sm);
+            }
+        }
+
         vTaskDelay(pdMS_TO_TICKS(30));
     }
 }
@@ -110,7 +127,7 @@ NetworkManager *NetworkManager::getInstance()
     return instance;
 }
 
-void NetworkManager::initialize(GameEntity *gameEntity)
+void NetworkManager::initialize(GameEntity *gameEntity, SceneManager *sceneManager)
 {
     instance = getInstance();
 
@@ -144,8 +161,9 @@ void NetworkManager::initialize(GameEntity *gameEntity)
     esp_now_register_recv_cb(onDataRecv);
 
     Serial.println("after esp_now_register_recv_cb");
-    instance->gameEntity = gameEntity;
 
+    instance->sceneManager = sceneManager;
+    instance->gameEntity = gameEntity;
     instance->initialized = true;
 }
 
@@ -171,7 +189,7 @@ void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, in
 {
     Message receive_Data;
     memcpy(&receive_Data, data, sizeof(receive_Data));
-    // Serial.printf("\nReceive Data - bytes received: %i\n", data_len);
+    //Serial.printf("\nReceive Data - bytes received: %i\n", data_len);
     switch (receive_Data.messageType)
     {
     case POSITION:
@@ -202,7 +220,16 @@ void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, in
         instance->gameEntity->getPaddle2()->setPoint(sm.paddle2Point);
     }
     break;
+    case SCENE:
+    {
+        SceneMessage sm;
+        memcpy(&sm, data, sizeof(sm));
+        Serial.printf("Receive Data - messageType: [SCENE], scenetype: %i\n", sm.sceneType);
+        instance->sceneManager->changeScene(sm.sceneType);
     }
+    break;
+    }
+    
 }
 
 bool NetworkManager::addPeer()
@@ -223,7 +250,7 @@ bool NetworkManager::checkResult(esp_err_t addStatus, String success_message)
 {
     if (addStatus == ESP_OK)
     {
-        Serial.println(success_message);
+        //Serial.println(success_message);
     }
     else if (addStatus == ESP_ERR_ESPNOW_NOT_INIT)
     {
