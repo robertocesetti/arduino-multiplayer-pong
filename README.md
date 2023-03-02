@@ -1,18 +1,16 @@
 # Arduino Multiplayer Pong
 
-This project is a multiplayer version of the classic game Pong, implemented on the ESP32 microcontroller. The game can be played by two players using two separate ESP32 modules, connected over Wi-Fi using the ESP NOW protocol.
+A project developed for *Embedded System Programming* course at the *University of Camerino* faculty of *Computer Science*.
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li><a href="#hardware-requirements">Hardware Requirements</a></li>
-    <li><a href="#software-requirements">Software Requirements</a></li>
-    <li><a href="#installation">Installation</a></li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#license">License</a></li>
-  </ol>
-</details>
+**Team:**<br><br>
+<a href="https://github.com/robertocesetti/arduino-multiplayer-pong/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=robertocesetti/arduino-multiplayer-pong" />
+</a>
+<br>
+
+## Application Domain
+
+This project is a multiplayer version of the classic game Pong, implemented on the ESP32 microcontroller. The game can be played by two players using two separate ESP32 modules, connected over Wi-Fi using the ESP NOW protocol.
 
 ## Hardware Requirements
 
@@ -25,10 +23,11 @@ The following hardware is required to run this project:
 
 The following software is required to run this project:
 
-- Visual Studio Code (https://www.arduino.cc/en/software)
+- Visual Studio Code (https://code.visualstudio.com/download)
 - PlatformIO extension for VS Code (https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
 - Adafruit SSD1306 library for OLED displays, automatically installed if you use PlatformIO (https://github.com/adafruit/Adafruit_SSD1306)
 - Adafruit GFX library, automatically installed if you use PlatformIO (https://github.com/adafruit/Adafruit-GFX-Library)
+- FreeRTOS, already available on ESP32 (https://www.freertos.org)
     
 ## Installation
 
@@ -36,7 +35,11 @@ The following software is required to run this project:
 2. Install Espressif 32 platform from PlatformIO.
 3. Clone the repository into your local machine.
 4. Configure the circuit as shown in the image below.
-![Circuit.png](resources/circuit.png "Circuit")
+
+<p align="center">
+      <img src="https://github.com/robertocesetti/arduino-multiplayer-pong/blob/main/resources/circuit.png?raw=true" alt="SuMo" style="max-width:100%;" width="500">
+</p>
+
 5. Connect the ESP32 modules to your computer via USB.
 6. Change the **L_MAC_1** and **L_MAC_2** inside src/network-manager.h according to the ESP32 MACs (you can obtain the MAC by reverse the result of the function `ESP.getEfuseMac()` or by usign the sketch belove).
 ```cpp
