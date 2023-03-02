@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "author": "DMR",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": -72.1, "left": 167.8, "attrs": {} },
+    {
+      "type": "wokwi-analog-joystick",
+      "id": "joystick1",
+      "top": -96.6,
+      "left": -71.4,
+      "attrs": {}
+    },
+    { "type": "board-ssd1306", "id": "oled1", "top": 127.94, "left": -66.97, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "esp:D34", "joystick1:HORZ", "green", [ "h-115.2", "v76.6", "h-76.8" ] ],
+    [
+      "esp:D18",
+      "joystick1:SEL",
+      "magenta",
+      [ "h28.5", "v-95.84", "h-249.6", "v134.24", "h-57.6" ]
+    ],
+    [ "joystick1:VERT", "esp:D35", "#8f4814", [ "v48", "h96", "v-76.8", "h105.6" ] ],
+    [ "oled1:SDA", "esp:D21", "orange", [ "v-9.6", "h47.4", "v57.81", "h240.67", "v-191.81" ] ],
+    [ "oled1:SCL", "esp:D22", "gold", [ "v-19.2", "h67.5", "v57.6", "h220.8", "v-210.9" ] ],
+    [ "joystick1:GND", "esp:GND.1", "black", [ "v19.2", "h38.4", "v-134.4", "h268.8", "v172.9" ] ],
+    [ "joystick1:VCC", "esp:3V3", "red", [ "v19.2", "h-57.6", "v-153.6", "h412.8", "v201.6" ] ],
+    [
+      "oled1:VCC",
+      "esp:3V3",
+      "red",
+      [ "h0.15", "v-38.4", "h-77.1", "v-211.2", "h413.1", "v201.6" ]
+    ],
+    [ "oled1:GND", "esp:GND.2", "black", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
