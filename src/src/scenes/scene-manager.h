@@ -4,6 +4,7 @@
 #include "../gameEntities/game-entity.h"
 #include "../render-engine.h"
 #include "../game-loop.h"
+#include "../messages/scene-message.h"
 
 const static int SCENE_NUMBER = 4;
 
@@ -14,6 +15,7 @@ private:
     GameEntity* gameEntities;
     RenderEngine* renderEngine;
     GameLoop* gameLoop;
+    SceneMessage sm;
 
     void createScenes();
 

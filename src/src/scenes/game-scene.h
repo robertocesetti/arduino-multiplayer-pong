@@ -3,14 +3,14 @@
 #include "../gameEntities/game-entity.h"
 #include "scene-manager.h"
 #include "scene.h"
-
-#define MAX_SCORE 5
+#include "../messages/scene-message.h"
 
 class GameScene : public Scene
 {
 private:
     SceneManager* sceneManager;
     GameEntity* gameEntities;
+    SceneMessage sm;
 
     void addPoint(Paddle *paddle);
     // void moveUsingAI(Paddle *paddle, bool godMode);

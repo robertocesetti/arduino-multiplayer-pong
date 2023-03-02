@@ -3,6 +3,8 @@
 #include "entity.h"
 #include "collision.h"
 
+#define MAX_SCORE 5
+
 class Paddle : public Entity
 {
 private:
@@ -25,5 +27,6 @@ public:
     bool isScoreChanged() { return lastScore != score;}
     void setPoint(short point){score=point;}
     void resetScore(){score = 0;}
+    bool won() { return score >= MAX_SCORE; }
 
 };

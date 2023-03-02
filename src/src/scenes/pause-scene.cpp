@@ -36,7 +36,7 @@ void PauseScene::render()
 {
   display->setTextSize(2); // Draw 2X-scale text
   display->setTextColor(SSD1306_WHITE);
-  display->setCursor(38, 0);
+  display->setCursor(38, 12);
   display->println(F("PAUSE"));
 
   if (drawPlayImage)

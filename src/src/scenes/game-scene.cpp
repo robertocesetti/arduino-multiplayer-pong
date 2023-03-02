@@ -3,6 +3,7 @@
 #include <Fonts/Org_01.h>
 #include "../gameEntities/collision.h"
 #include "../network-manager.h"
+#include "../game-task-manager.h"
 
 // https://xbm.jazzychad.net/
 
@@ -65,12 +66,15 @@ void GameScene::tick()
     }
 }
 
+
 void GameScene::addPoint(Paddle *paddle)
 {
     paddle->addPoint();
     gameEntities->resetBall();
-    if (paddle->getScore() >= MAX_SCORE)
+    if (paddle->won())
     {
+        sm.sceneType = SCORE;
+        GameTaskManager::getInstance()->networkQueueSend(&sm);
         sceneManager->changeScene(SCORE);
     }
 }

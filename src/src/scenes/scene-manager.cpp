@@ -4,7 +4,6 @@
 #include "game-scene.h"
 #include "final-score-scene.h"
 #include "pause-scene.h"
-#include "../messages/scene-message.h"
 #include "../game-task-manager.h"
 
 SceneManager::SceneManager(GameEntity *ge, RenderEngine *re, GameLoop *gl) : gameEntities(ge), renderEngine(re), gameLoop(gl)
@@ -51,8 +50,6 @@ void SceneManager::changeScene(SceneType sceneType)
         }
     }
 }
-
-SceneMessage sm;
 
 void SceneManager::changeScene()
 {
