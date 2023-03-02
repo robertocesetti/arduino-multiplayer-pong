@@ -25,7 +25,7 @@ The following hardware is required to run this project:
 
 The following software is required to run this project:
 
-- Visual Studio Code (https://www.arduino.cc/en/software)
+- Visual Studio Code (https://code.visualstudio.com/download)
 - PlatformIO extension for VS Code (https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
 - Adafruit SSD1306 library for OLED displays, automatically installed if you use PlatformIO (https://github.com/adafruit/Adafruit_SSD1306)
 - Adafruit GFX library, automatically installed if you use PlatformIO (https://github.com/adafruit/Adafruit-GFX-Library)
