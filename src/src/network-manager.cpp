@@ -15,24 +15,23 @@ NetworkManager::NetworkManager() : initialized(false)
     WiFi.mode(WIFI_STA);
     uint64_t mac = ESP.getEfuseMac();
     uint8_t macArray[6];
-
     for (int i = 0; i < 6; i++)
     {
-        macArray[i] = (mac >> ((5 - i) * 8)) & 0xFF;
+        macArray[5-i] = (mac >> ((5 - i) * 8)) & 0xFF;
     }
 
-    if (memcmp(macArray, U_MAC_1, 6) == 0)
+    if (memcmp(macArray, L_MAC_1, 6) == 0)
     {
         Serial.println("\nI'm the Master\n");
         master = true;
-        auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDE, 0x08, 0x58});
+        auto init = std::initializer_list<uint8_t>({L_MAC_2[0], L_MAC_2[1], L_MAC_2[2], L_MAC_2[3], L_MAC_2[4], L_MAC_2[5]});
         std::copy(init.begin(), init.end(), broadcastAddress);
     }
-    else if (memcmp(macArray, U_MAC_2, 6) == 0)
+    else if (memcmp(macArray, L_MAC_2, 6) == 0)
     {
         Serial.println("\nI'm the Slave\n");
         master = false;
-        auto init = std::initializer_list<uint8_t>({0x78, 0x21, 0x84, 0xDD, 0xF2, 0x84});
+        auto init = std::initializer_list<uint8_t>({L_MAC_1[0], L_MAC_1[1], L_MAC_1[2], L_MAC_1[3], L_MAC_1[4], L_MAC_1[5]});
         std::copy(init.begin(), init.end(), broadcastAddress);
     }
     else
