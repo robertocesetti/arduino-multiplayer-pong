@@ -38,3 +38,12 @@ void GameEntity::resetBall()
     }
     ball.updateVelocity(velX, START_VELOCITY_Y);
 }
+
+bool GameEntity::preparePointMessage(PointMessage *pointMessage)
+{
+    if(!paddle1.isScoreChanged() && !paddle2.isScoreChanged()) return false;
+    
+    pointMessage->paddle1Point = paddle1.getScore();
+    pointMessage->paddle2Point = paddle2.getScore();
+    return true;
+}

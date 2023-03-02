@@ -26,3 +26,15 @@ Collision Paddle::collideWithBoard(DisplayProperties *displayProperties)
 
     return NONE;
 }
+
+bool Paddle::preparePositionMessage(PositionMessage *positionMessage)
+{
+    positionMessage->enityType = PADDLE;
+    return Entity::preparePositionMessage(positionMessage);
+}
+
+void Paddle::addPoint()
+{
+    lastScore = score;
+    score++;
+}

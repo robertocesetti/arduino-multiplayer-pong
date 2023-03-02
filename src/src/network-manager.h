@@ -34,6 +34,11 @@ private:
     bool addPeer();
     bool checkResult(esp_err_t addStatus, String success_message);
 
+    template <typename T>
+    void sendMessage(const T &message);
+    static void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status);
+    static void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len);
+
     NetworkManager();
 
 public:
@@ -41,15 +46,9 @@ public:
 
     bool isMaster() { return master; }
     bool isSlave() { return !master; }
-    const uint8_t *getOtherMAC() { return master ? L_MAC_2 : L_MAC_1; };
-
-    template <typename T>
-    void sendMessage(const T &message);
-
     void startCommunication();
+    Paddle *getMyPaddle() { return master ? gameEntity->getPaddle2() : gameEntity->getPaddle1(); };
 
     static NetworkManager *getInstance();
     static void initialize(GameEntity *gameEntity, SceneManager *sceneManager);
-    static void onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status);
-    static void onDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len);
 };

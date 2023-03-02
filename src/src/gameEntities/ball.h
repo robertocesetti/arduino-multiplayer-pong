@@ -32,5 +32,6 @@ public:
     unsigned int getRadius() { return RADIUS; }
     void collideWithPaddle(Paddle *paddle);
     virtual Collision collideWithBoard(DisplayProperties *displayProperties);
+    bool preparePositionMessage(PositionMessage* positionMessage) override;
 
 };

@@ -62,12 +62,17 @@ void NetworkManager::sendMessage(const T &message)
 void NetworkManager::startCommunication()
 {
     Ball *ball = gameEntity->getBall();
+    /*
     Paddle *paddle1 = gameEntity->getPaddle1();
     Paddle *paddle2 = gameEntity->getPaddle2();
+    */
+
+    Paddle *paddle = getMyPaddle();
+
     PositionMessage positionMessage;
     PointMessage pointMessage;
     SceneMessage sm;
-    Message* pxRxedMessage;
+    Message *pxRxedMessage;
 
     QueueHandle_t xQueue = GameTaskManager::getInstance()->tasks.networkQueueHandler;
 
@@ -82,33 +87,22 @@ void NetworkManager::startCommunication()
 
         if (master)
         {
-            positionMessage.enityType = BALL;
-            positionMessage.positionX = ball->getPositionX();
-            positionMessage.positionY = ball->getPositionY();
-            sendMessage(positionMessage);
+            if(ball->preparePositionMessage(&positionMessage))
+                sendMessage(positionMessage);
 
-            positionMessage.enityType = PADDLE;
-            positionMessage.positionX = paddle2->getPositionX();
-            positionMessage.positionY = paddle2->getPositionY();
-            sendMessage(positionMessage);
-
-            pointMessage.paddle1Point = paddle1->getScore();
-            pointMessage.paddle2Point = paddle2->getScore();
-            sendMessage(pointMessage);
-        }
-        else
-        {
-            positionMessage.enityType = PADDLE;
-            positionMessage.positionX = paddle1->getPositionX();
-            positionMessage.positionY = paddle1->getPositionY();
-            sendMessage(positionMessage);
+            if(gameEntity->preparePointMessage(&pointMessage))
+                sendMessage(pointMessage);
         }
 
-        if( xQueueReceive( xQueue, &( pxRxedMessage ), 10 ) == pdPASS )
+        if(paddle->preparePositionMessage(&positionMessage))
+            sendMessage(positionMessage);
+
+        if (xQueueReceive(xQueue, &(pxRxedMessage), 10) == pdPASS)
         {
             Serial.printf("Received message from queue - messageType %i, queue space %i\n", pxRxedMessage->messageType, uxQueueSpacesAvailable(xQueue));
-            if(pxRxedMessage->messageType == SCENE){
-                sm = *((SceneMessage*) pxRxedMessage);
+            if (pxRxedMessage->messageType == SCENE)
+            {
+                sm = *((SceneMessage *)pxRxedMessage);
                 Serial.printf("pxRxedMessage: %p, sm: %p, st: %i\n", pxRxedMessage, &sm, sm.sceneType);
                 sendMessage(sm);
             }
@@ -189,7 +183,7 @@ void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, in
 {
     Message receive_Data;
     memcpy(&receive_Data, data, sizeof(receive_Data));
-    //Serial.printf("\nReceive Data - bytes received: %i\n", data_len);
+    // Serial.printf("\nReceive Data - bytes received: %i\n", data_len);
     switch (receive_Data.messageType)
     {
     case POSITION:
@@ -229,7 +223,6 @@ void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, in
     }
     break;
     }
-    
 }
 
 bool NetworkManager::addPeer()
@@ -250,7 +243,7 @@ bool NetworkManager::checkResult(esp_err_t addStatus, String success_message)
 {
     if (addStatus == ESP_OK)
     {
-        //Serial.println(success_message);
+        // Serial.println(success_message);
     }
     else if (addStatus == ESP_ERR_ESPNOW_NOT_INIT)
     {

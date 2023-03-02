@@ -10,6 +10,9 @@ Entity::~Entity()
 
 void Entity::move()
 {
+    lastPositionX = (unsigned int)positionX;
+    lastPositionY = (unsigned int)positionY;
+
     positionX += velocityX;
     positionY += velocityY;
 }
@@ -28,4 +31,14 @@ void Entity::reverseVelocityX()
 void Entity::reverseVelocityY()
 {
     velocityY = -velocityY;
+}
+
+bool Entity::preparePositionMessage(PositionMessage *positionMessage)
+{
+    if (lastPositionX == getPositionX() && lastPositionY == getPositionY())
+        return false;
+
+    positionMessage->positionX = getPositionX();
+    positionMessage->positionY = getPositionY();
+    return true;
 }

@@ -48,6 +48,12 @@ Collision Ball::collideWithBoard(DisplayProperties *displayProperties)
     return collide;
 }
 
+bool Ball::preparePositionMessage(PositionMessage *positionMessage)
+{
+    positionMessage->enityType = BALL;
+    return Entity::preparePositionMessage(positionMessage);
+}
+
 void Ball::collideWithPaddle(Paddle *paddle)
 {
     float paddleX = paddle->getPositionX();
