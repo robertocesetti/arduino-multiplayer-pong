@@ -122,7 +122,7 @@ void GameEngine::createTasks()
         this,         // Task parameter
         1,            // Task priority
         &GameTaskManager::getInstance()->tasks.networkTaskHandler,
-        1);
+        0);
 
     // Create the task for printing the status
     xTaskCreatePinnedToCore(
