@@ -35,10 +35,14 @@ void xTaskNetwork(void *params)
 
 void xTaskStatus(void *params)
 {
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xFrequency = 10000;
     Serial.println(F("Starting task 'xTaskStatus'"));
     GameTaskManager *gmt = GameTaskManager::getInstance();
     while (true)
     {
+        // Wait for the next cycle.
+        vTaskDelayUntil( &xLastWakeTime, xFrequency );
         Serial.print(F("\n\n------ APP STATUS ------\n"));
         gmt->printTasksStatus();
         Serial.printf("Memory heap: %i (used) / %i (total)\n", ESP.getFreeHeap(), ESP.getHeapSize());
@@ -46,7 +50,6 @@ void xTaskStatus(void *params)
         Serial.print(F("------------------------\n\n\n"));
         Serial.printf("\nCHIP MAC: %012llx\n", ESP.getEfuseMac());
         Serial.printf("\nCHIP MODEL: %012llx\n", ESP.getChipModel());
-        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 
@@ -80,8 +83,8 @@ void GameEngine::start()
 void GameEngine::createTasks()
 {
 
-    GameTaskManager::getInstance()->tasks.networkQueueHandler = xQueueCreate( 5, sizeof(Message*));
-    
+    GameTaskManager::getInstance()->tasks.networkQueueHandler = xQueueCreate(5, sizeof(Message *));
+
     // Create the task for the rendering
     xTaskCreatePinnedToCore(
         xTaskRender, // Pointer to the task function
