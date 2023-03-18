@@ -4,6 +4,8 @@
 #include "game-scene.h"
 #include "final-score-scene.h"
 #include "pause-scene.h"
+#include "waiting-scene.h"
+#include "connection-scene.h"
 #include "../game-task-manager.h"
 
 SceneManager::SceneManager(GameEntity *ge, RenderEngine *re, GameLoop *gl) : gameEntities(ge), renderEngine(re), gameLoop(gl)
@@ -21,11 +23,15 @@ void SceneManager::createScenes()
     auto fs = new FinalScoreScene();
     auto ss = new StartScene();
     auto ps = new PauseScene();
+    auto ws = new WaitingScene();
+    auto cs = new ConnectionScene();
 
     scenes[0] = gs;
     scenes[1] = fs;
     scenes[2] = ss;
     scenes[3] = ps;
+    scenes[4] = ws;
+    scenes[5] = cs;
 
     Serial.println("Scene loaded:");
     for (Scene *scene : scenes)
@@ -51,13 +57,40 @@ void SceneManager::changeScene(SceneType sceneType)
     }
 }
 
+void SceneManager::setReady(bool r)
+{
+    ready = r;
+    checkReadyState();
+}
+
+void SceneManager::setReady2(bool r)
+{
+    ready2 = r;
+    checkReadyState();
+}
+
+void SceneManager::checkReadyState()
+{
+    Serial.printf("Status Players: P1: %i -- P2: %i\n", ready, ready2);
+    if (ready && ready2)
+    {
+        changeScene();
+    }
+}
+
 void SceneManager::changeScene()
 {
-    
     switch (getCurrentScene())
     {
     case START:
+        changeScene(WAITING);
+        setReady(true);
+        break;
+    case WAITING:
+        if(!ready || !ready2) break;
         changeScene(GAME);
+        sm.sceneType = GAME;
+        GameTaskManager::getInstance()->networkQueueSend(&sm);
         break;
     case PAUSE:
         changeScene(GAME);
@@ -70,10 +103,17 @@ void SceneManager::changeScene()
         GameTaskManager::getInstance()->networkQueueSend(&sm);
         break;
     case SCORE:
-        gameEntities->resetGame();
-        changeScene(START);
+        restart();
         break;
     default:
         break;
     }
+}
+
+void SceneManager::restart()
+{
+    gameEntities->resetGame();
+    changeScene(CONNECTION);
+    ready = false;
+    ready2 = false;
 }

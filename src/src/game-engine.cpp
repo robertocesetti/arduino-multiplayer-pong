@@ -28,7 +28,16 @@ void xTaskInputManager(void *params)
 void xTaskNetwork(void *params)
 {
     Serial.println(F("Starting task 'xTaskNetwork'"));
+
     GameEngine *engine = static_cast<GameEngine *>(params);
+
+    while (!NetworkManager::initialize(engine->getGameEntity(), engine->getSceneManager()))
+    {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        NetworkManager::getInstance()->setLog("Failed to init ESP-NOW, retrying in " + String(ESP_INIT_RETRY / 1000) + " seconds");
+        vTaskDelay(pdMS_TO_TICKS(ESP_INIT_RETRY));
+    }
+
     // engine->getNetworkManager()->receiveData();
     NetworkManager::getInstance()->startCommunication();
 }
@@ -42,7 +51,7 @@ void xTaskStatus(void *params)
     while (true)
     {
         // Wait for the next cycle.
-        vTaskDelayUntil( &xLastWakeTime, xFrequency );
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);
         Serial.print(F("\n\n------ APP STATUS ------\n"));
         gmt->printTasksStatus();
         Serial.printf("Memory heap: %i (used) / %i (total)\n", ESP.getFreeHeap(), ESP.getHeapSize());
@@ -73,11 +82,10 @@ void GameEngine::start()
 
     running = true;
 
-    NetworkManager::initialize(&gameEntity, &sceneManager);
     createTasks();
 
     gameEntity.resetGame();
-    sceneManager.changeScene(START);
+    sceneManager.changeScene(CONNECTION);
 }
 
 void GameEngine::createTasks()

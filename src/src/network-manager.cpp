@@ -3,6 +3,8 @@
 #include "messages/position-message.h"
 #include "messages/point-message.h"
 #include "messages/scene-message.h"
+#include "messages/ready-message.h"
+#include "messages/connection-message.h"
 #include "game-task-manager.h"
 
 #include <esp_wifi.h>
@@ -17,7 +19,7 @@ NetworkManager::NetworkManager() : initialized(false)
     uint8_t macArray[6];
     for (int i = 0; i < 6; i++)
     {
-        macArray[5-i] = (mac >> ((5 - i) * 8)) & 0xFF;
+        macArray[5 - i] = (mac >> ((5 - i) * 8)) & 0xFF;
     }
 
     if (memcmp(macArray, L_MAC_1, 6) == 0)
@@ -61,11 +63,6 @@ void NetworkManager::sendMessage(const T &message)
 void NetworkManager::startCommunication()
 {
     Ball *ball = gameEntity->getBall();
-    /*
-    Paddle *paddle1 = gameEntity->getPaddle1();
-    Paddle *paddle2 = gameEntity->getPaddle2();
-    */
-
     Paddle *paddle = getMyPaddle();
 
     PositionMessage positionMessage;
@@ -84,16 +81,27 @@ void NetworkManager::startCommunication()
             continue;
         }
 
+        while (!connected)
+        {
+            checkConnection();
+            if (!connected)
+            {
+                vTaskDelay(pdMS_TO_TICKS(1000));
+                setLog("Failed to establish a connection, retrying in " + String(RECONNECT_DELAY / 1000) + " seconds");
+                vTaskDelay(pdMS_TO_TICKS(RECONNECT_DELAY));
+            }
+        }
+
         if (master)
         {
-            if(ball->preparePositionMessage(&positionMessage))
+            if (ball->preparePositionMessage(&positionMessage))
                 sendMessage(positionMessage);
 
-            if(gameEntity->preparePointMessage(&pointMessage))
+            if (gameEntity->preparePointMessage(&pointMessage))
                 sendMessage(pointMessage);
         }
 
-        if(paddle->preparePositionMessage(&positionMessage))
+        if (paddle->preparePositionMessage(&positionMessage))
             sendMessage(positionMessage);
 
         if (xQueueReceive(xQueue, &(pxRxedMessage), 10) == pdPASS)
@@ -120,27 +128,33 @@ NetworkManager *NetworkManager::getInstance()
     return instance;
 }
 
-void NetworkManager::initialize(GameEntity *gameEntity, SceneManager *sceneManager)
+bool NetworkManager::initialize(GameEntity *gameEntity, SceneManager *sceneManager)
 {
     instance = getInstance();
 
     if (instance->initialized)
-        return;
+        return false;
+
+    instance->log = "";
 
     // Deinit ESP-NOW to ensure a clean start
     esp_now_deinit();
 
     Serial.println("ESP initialize");
+    instance->log += "ESP Initialization\n";
 
     // Init ESP-NOW
     if (esp_now_init() != ESP_OK)
     {
         Serial.println("Error initializing ESP-NOW");
+        instance->log += "Error initializing ESP-NOW\n";
+
         vTaskDelay(pdMS_TO_TICKS(1000));
         ESP.restart();
-        return;
+        return false;
     }
     Serial.println("ESP NOW INIT");
+    instance->log += "ESP-NOW initialized\n";
 
     // Once ESPNow is successfully Init, we will register for Send CB to get the status of Trasnmitted paket
     esp_now_register_send_cb(onDataSent);
@@ -148,16 +162,32 @@ void NetworkManager::initialize(GameEntity *gameEntity, SceneManager *sceneManag
     Serial.println("after esp_now_register_send_cb");
 
     if (!instance->addPeer())
-        return;
+    {
+        instance->log += "Error adding Peer\n";
+        return false;
+    }
 
     //  Register for a callback function that will be called when data is received
     esp_now_register_recv_cb(onDataRecv);
 
     Serial.println("after esp_now_register_recv_cb");
+    instance->log += "Init successfull\n";
 
     instance->sceneManager = sceneManager;
     instance->gameEntity = gameEntity;
+    instance->lastReceivedPacketTime = millis();
     instance->initialized = true;
+
+    return true;
+}
+
+void NetworkManager::checkConnection()
+{
+    ConnectionMessage connectionMessage;
+
+    instance->sendMessage(connectionMessage);
+    vTaskDelay(MILLIS_TIMEOUT);
+    instance->sendMessage(connectionMessage);
 }
 
 void formatMacAddress(const uint8_t *macAddr, char *buffer, int maxLength)
@@ -171,6 +201,35 @@ void NetworkManager::onDataSent(const uint8_t *mac_addr, esp_now_send_status_t s
 {
     char macStr[18];
     formatMacAddress(mac_addr, macStr, 18);
+
+    unsigned long now = millis();
+    if (status == ESP_NOW_SEND_SUCCESS)
+    {
+        instance->lastReceivedPacketTime = now;
+
+        if (!instance->connected)
+        {
+            instance->connected = true;
+            instance->sceneManager->changeScene(START);
+        }
+    }
+    else if (now - instance->lastReceivedPacketTime >= MILLIS_TIMEOUT)
+    {
+        if (instance->connected)
+        {
+            Serial.println("Connection lost...");
+            instance->log += "Connection lost...\n";
+            instance->sceneManager->restart();
+        }
+        else
+        {
+            Serial.println("Unable to connect...");
+            instance->log += "Unable to connect...\n";
+        }
+
+        instance->connected = false;
+    }
+
     /*Serial.print("Last Packet Sent to: ");
     Serial.println(macStr);
     Serial.print("Last Packet Send Status: ");
@@ -219,6 +278,14 @@ void NetworkManager::onDataRecv(const uint8_t *mac_addr, const uint8_t *data, in
         memcpy(&sm, data, sizeof(sm));
         Serial.printf("Receive Data - messageType: [SCENE], scenetype: %i\n", sm.sceneType);
         instance->sceneManager->changeScene(sm.sceneType);
+    }
+    break;
+    case READY:
+    {
+        ReadyMessage rm;
+        memcpy(&rm, data, sizeof(rm));
+        Serial.printf("Receive Data - messageType: [READY], ready: %i\n", rm.ready);
+        instance->sceneManager->setReady2(rm.ready);
     }
     break;
     }

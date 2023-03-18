@@ -9,7 +9,9 @@ enum SceneType
     GAME,
     SCORE,
     START,
-    PAUSE
+    PAUSE,
+    WAITING,
+    CONNECTION
 };
 
 class Scene

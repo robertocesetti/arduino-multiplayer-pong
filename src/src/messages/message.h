@@ -1,6 +1,6 @@
 #pragma once
 
-enum MessageType {POSITION, POINT, SCENE};
+enum MessageType {POSITION, POINT, SCENE, READY, HANDSHAKE};
 
 struct Message
 {
