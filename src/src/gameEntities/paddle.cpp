@@ -1,4 +1,5 @@
 #include "paddle.h"
+#include "../config.h"
 #include <Arduino.h>
 
 Paddle::Paddle()
@@ -36,5 +37,5 @@ bool Paddle::preparePositionMessage(PositionMessage *positionMessage)
 void Paddle::addPoint()
 {
     lastScore = score;
-    score++;
+    if(!DEBUG) score++;
 }

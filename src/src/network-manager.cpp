@@ -6,7 +6,7 @@
 #include "messages/ready-message.h"
 #include "messages/connection-message.h"
 #include "game-task-manager.h"
-
+#include "config.h"
 #include <esp_wifi.h>
 
 NetworkManager *NetworkManager::instance = nullptr;
@@ -179,6 +179,14 @@ bool NetworkManager::initialize(GameEntity *gameEntity, SceneManager *sceneManag
     instance->initialized = true;
     instance->connected = false;
 
+    if (DEBUG)
+    {
+        instance->connected = true;
+        instance->master = true;
+        sceneManager->setReady2(true);
+        sceneManager->changeScene(START);
+    }
+
     return true;
 }
 
@@ -202,6 +210,9 @@ void NetworkManager::onDataSent(const uint8_t *mac_addr, esp_now_send_status_t s
 {
     char macStr[18];
     formatMacAddress(mac_addr, macStr, 18);
+
+    if (DEBUG)
+        return;
 
     unsigned long now = millis();
     if (status == ESP_NOW_SEND_SUCCESS)

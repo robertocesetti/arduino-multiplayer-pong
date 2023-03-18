@@ -88,7 +88,7 @@ void Ball::collideWithPaddle(Paddle *paddle)
         Serial.println(velocityY);
         */
 
-        if (positionY >= paddleY && positionY <= paddleY + paddleHeight)
+        if (positionY >= paddleY && positionY <= paddleY + paddleHeight) // Bal hit the paddle left/right side
         {
             float newX = positionX;
 
@@ -106,7 +106,7 @@ void Ball::collideWithPaddle(Paddle *paddle)
             addRandomness(randomness / 5, randomness / 10);
             reverseVelocityX();
         }
-        else if (positionX >= paddleX && positionX <= paddleX + paddleWidth)
+        else if (positionX >= paddleX && positionX <= paddleX + paddleWidth) // Bal hit the paddle top/bottom side
         {
             float newY = positionY;
 
@@ -122,10 +122,12 @@ void Ball::collideWithPaddle(Paddle *paddle)
             setPosition(positionX, newY);
             reverseVelocityY();
         }
-        else
+        else // Ball hit the paddle corner
         {
             float newX = positionX;
             float newY = positionY;
+            ballCollideOnTopBorder = positionY - RADIUS < paddleY && paddleY < positionY + RADIUS;
+            ballCollideOnBottomBorder = positionY - RADIUS < paddleY + paddleHeight && paddleY + paddleHeight < positionY + RADIUS;
 
             if (ballCollideOnLeftBorder && velocityX > 0)
             {
