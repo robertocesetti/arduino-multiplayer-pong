@@ -87,7 +87,7 @@ void NetworkManager::startCommunication()
             if (!connected)
             {
                 vTaskDelay(pdMS_TO_TICKS(1000));
-                setLog("Failed to establish a connection, retrying in " + String(RECONNECT_DELAY / 1000) + " seconds");
+                setLog("Failed to establish a connection, retrying in " + String(RECONNECT_DELAY / 1000) + " seconds\n");
                 vTaskDelay(pdMS_TO_TICKS(RECONNECT_DELAY));
             }
         }
@@ -177,6 +177,7 @@ bool NetworkManager::initialize(GameEntity *gameEntity, SceneManager *sceneManag
     instance->gameEntity = gameEntity;
     instance->lastReceivedPacketTime = millis();
     instance->initialized = true;
+    instance->connected = false;
 
     return true;
 }

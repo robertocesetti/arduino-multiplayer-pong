@@ -34,7 +34,7 @@ void xTaskNetwork(void *params)
     while (!NetworkManager::initialize(engine->getGameEntity(), engine->getSceneManager()))
     {
         vTaskDelay(pdMS_TO_TICKS(1000));
-        NetworkManager::getInstance()->setLog("Failed to init ESP-NOW, retrying in " + String(ESP_INIT_RETRY / 1000) + " seconds");
+        NetworkManager::getInstance()->setLog("Failed to init ESP-NOW, retrying in " + String(ESP_INIT_RETRY / 1000) + " seconds\n");
         vTaskDelay(pdMS_TO_TICKS(ESP_INIT_RETRY));
     }
 
