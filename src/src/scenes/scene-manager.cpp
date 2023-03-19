@@ -60,7 +60,7 @@ void SceneManager::changeScene(SceneType sceneType)
 void SceneManager::setReady(bool r)
 {
     ready = r;
-    checkReadyState();
+    // checkReadyState();
 }
 
 void SceneManager::setReady2(bool r)
@@ -83,11 +83,16 @@ void SceneManager::changeScene()
     switch (getCurrentScene())
     {
     case START:
-        changeScene(WAITING);
         setReady(true);
+        changeScene(WAITING);
+        rm.ready = true;
+        GameTaskManager::getInstance()->networkQueueSend(&rm);
         break;
     case WAITING:
-        if(!ready || !ready2) break;
+        if (!ready || !ready2)
+            break;
+        ready = false;
+        ready2 = false;
         changeScene(GAME);
         sm.sceneType = GAME;
         GameTaskManager::getInstance()->networkQueueSend(&sm);

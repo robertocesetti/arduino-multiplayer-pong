@@ -5,6 +5,7 @@
 #include "../render-engine.h"
 #include "../game-loop.h"
 #include "../messages/scene-message.h"
+#include "../messages/ready-message.h"
 
 const static int SCENE_NUMBER = 6;
 
@@ -16,8 +17,9 @@ private:
     RenderEngine* renderEngine;
     GameLoop* gameLoop;
     SceneMessage sm;
-    bool ready;
-    bool ready2;
+    ReadyMessage rm;
+    bool ready = false;
+    bool ready2 = false;
 
     void createScenes();
     void checkReadyState();

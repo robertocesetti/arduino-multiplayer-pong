@@ -68,6 +68,7 @@ void NetworkManager::startCommunication()
     PositionMessage positionMessage;
     PointMessage pointMessage;
     SceneMessage sm;
+    ReadyMessage rm;
     Message *pxRxedMessage;
 
     QueueHandle_t xQueue = GameTaskManager::getInstance()->tasks.networkQueueHandler;
@@ -112,6 +113,13 @@ void NetworkManager::startCommunication()
                 sm = *((SceneMessage *)pxRxedMessage);
                 Serial.printf("pxRxedMessage: %p, sm: %p, st: %i\n", pxRxedMessage, &sm, sm.sceneType);
                 sendMessage(sm);
+            }
+
+            if (pxRxedMessage->messageType == READY)
+            {
+                rm = *((ReadyMessage *)pxRxedMessage);
+                Serial.printf("Ready Message");
+                sendMessage(rm);
             }
         }
 
