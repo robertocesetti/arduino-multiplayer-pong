@@ -72,7 +72,7 @@ void SceneManager::setReady2(bool r)
 void SceneManager::checkReadyState()
 {
     Serial.printf("Status Players: P1: %i -- P2: %i\n", ready, ready2);
-    if (ready && ready2)
+    if (ready && ready2 && getCurrentScene() == WAITING)
     {
         changeScene();
     }
@@ -118,7 +118,7 @@ void SceneManager::changeScene()
 void SceneManager::restart()
 {
     gameEntities->resetGame();
-    changeScene(CONNECTION);
+    changeScene(START);
     ready = false;
     ready2 = false;
 }

@@ -1,5 +1,4 @@
 #include <Arduino.h>
-//#include <Arduino_FreeRTOS.h>
 #include "input-manager.h"
 #include "network-manager.h"
 
@@ -46,8 +45,10 @@ void InputManager::startReading(GameEntity *gameEntities)
             velocityY = 2;
         }
 
-        if(NetworkManager::getInstance()->isMaster()) paddle2->updateVelocity(0, velocityY);
-        else paddle1->updateVelocity(0, velocityY);
+        if (NetworkManager::getInstance()->isMaster())
+            paddle2->updateVelocity(0, velocityY);
+        else
+            paddle1->updateVelocity(0, velocityY);
 
         btn_prev = digitalRead(SEL);
         vTaskDelay(pdMS_TO_TICKS(50)); // TODO 10
