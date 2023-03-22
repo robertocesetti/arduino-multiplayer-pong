@@ -26,7 +26,7 @@ public:
     unsigned int getScore() {return score;}
     bool isScoreChanged() { return lastScore != score;}
     void setPoint(short point){score=point;}
-    void resetScore(){score = 0;}
+    void resetScore();
     bool won() { return score >= MAX_SCORE; }
 
 };

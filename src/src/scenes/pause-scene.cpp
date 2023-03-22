@@ -1,5 +1,6 @@
 #include "pause-scene.h"
 #include <Arduino.h>
+#include <Fonts/Org_01.h>
 
 /* 32 x 32*/
 static const unsigned char PAUSE_ICON[] = {0x0C, 0x00, 0x00, 0x00, 0x7C, 0x00, 0x00, 0x00, 0xFC, 0x00, 0x00, 0x00,
@@ -34,7 +35,7 @@ void PauseScene::tick()
 
 void PauseScene::render()
 {
-  display->setFont();
+  display->setFont(&Org_01);
   display->setTextSize(2); // Draw 2X-scale text
   display->setTextColor(SSD1306_WHITE);
   display->setCursor(38, 12);

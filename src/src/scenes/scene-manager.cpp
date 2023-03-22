@@ -93,6 +93,7 @@ void SceneManager::changeScene()
             break;
         ready = false;
         ready2 = false;
+        gameEntities->resetGame();
         changeScene(GAME);
         sm.sceneType = GAME;
         GameTaskManager::getInstance()->networkQueueSend(&sm);

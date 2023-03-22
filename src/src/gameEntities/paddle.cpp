@@ -39,3 +39,8 @@ void Paddle::addPoint()
     lastScore = score;
     if(!DEBUG) score++;
 }
+
+void Paddle::resetScore(){
+   score = 0;
+   lastScore = MAX_SCORE+1;
+}
