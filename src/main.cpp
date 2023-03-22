@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "src/game-engine.h"
 
-GameEngine* gameEngine;
+GameEngine *gameEngine;
 
 void setup()
 {

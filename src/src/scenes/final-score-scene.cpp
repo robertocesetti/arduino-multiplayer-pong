@@ -27,7 +27,7 @@ FinalScoreScene::~FinalScoreScene()
 
 void FinalScoreScene::render()
 {
-    
+    display->setFont();
     display->setTextColor(SSD1306_WHITE);
 
     if (NetworkManager::getInstance()->getMyPaddle()->won())

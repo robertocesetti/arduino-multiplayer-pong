@@ -239,6 +239,7 @@ StartScene::~StartScene()
 
 void StartScene::render()
 {
+    display->setFont();
     //display->drawXBitmap(0, 0, IMG, 64, 64, SSD1306_WHITE);
     display->drawXBitmap(0, 0, IMG_PONG_2, 64, 64, SSD1306_WHITE);
     

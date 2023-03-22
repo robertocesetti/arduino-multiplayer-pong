@@ -34,6 +34,7 @@ void PauseScene::tick()
 
 void PauseScene::render()
 {
+  display->setFont();
   display->setTextSize(2); // Draw 2X-scale text
   display->setTextColor(SSD1306_WHITE);
   display->setCursor(38, 12);
